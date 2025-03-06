@@ -1,0 +1,16 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Tiger3Automation Suite">
+    <test name="Windows Testleri">
+        <parameter name="testMode" value="WINDOWS"/>
+        <classes>
+            <class name="testRunners.TestRunner"/>
+        </classes>
+    </test>
+
+    <test name="Web Testleri">
+        <parameter name="testMode" value="WEB"/>
+        <classes>
+            <class name="testRunners.TestRunner"/>
+        </classes>
+    </test>
+</suite>

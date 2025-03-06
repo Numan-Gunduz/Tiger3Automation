@@ -7,36 +7,20 @@ import utils.DriverFactory;
 public class LoginPage {
     private WindowsDriver driver;
 
+    // Element locators
+    private final By usernameField = By.name("Kullanıcı");
+    private final By passwordField = By.name("Şifre");
+    private final By companyField = By.name("Firma");
+    private final By loginButton = By.name("Giriş Yap");
+
     public LoginPage() {
         this.driver = DriverFactory.getWinDriver();
     }
 
-    // Tiger3 Login ekranındaki elementlerin tanımlanması
-    private By usernameField = By.name("Kullanıcı");
-    private By passwordField = By.name("Şifre");
-    private By firmaField = By.className("Edit"); // Firma alanı için sınıf ismi kullanıyoruz
-    private By girisButton = By.name("Giriş Yap");
-
-    public void enterUsername(String username) {
+    public void login(String username, String password, String company) {
         driver.findElement(usernameField).sendKeys(username);
-    }
-
-    public void enterPassword(String password) {
         driver.findElement(passwordField).sendKeys(password);
-    }
-
-    public void enterFirma(String firma) {
-        driver.findElement(firmaField).sendKeys(firma);
-    }
-
-    public void clickLogin() {
-        driver.findElement(girisButton).click();
-    }
-
-    public void login(String username, String password, String firma) {
-        enterUsername(username);
-        enterPassword(password);
-        enterFirma(firma);
-        clickLogin();
+        driver.findElement(companyField).sendKeys(company);
+        driver.findElement(loginButton).click();
     }
 }

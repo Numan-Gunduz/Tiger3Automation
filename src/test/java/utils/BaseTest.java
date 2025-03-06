@@ -1,33 +1,36 @@
 package utils;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import pages.LoginPage;
-import pages.OnlineHesapOzetiPage;
+import io.appium.java_client.windows.WindowsDriver;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 public class BaseTest {
-    protected LoginPage loginPage;
-    protected OnlineHesapOzetiPage onlineHesapOzetiPage;
+    protected WindowsDriver winDriver;
+    protected WebDriver webDriver;
+    protected String testMode = "WINDOWS"; // Default olarak Windows modunda başlat.
 
-    @BeforeEach
-    public void setup() {
-        // Tiger3 uygulamasını başlat
-        DriverFactory.startTiger3();
-
-        // Tiger3 Login işlemini gerçekleştir
-        loginPage = new LoginPage();
-        loginPage.login("logo", "logo", "1");
-
-        // Online Hesap Özeti Uygulamasına giriş yap
-        onlineHesapOzetiPage = new OnlineHesapOzetiPage();
-        onlineHesapOzetiPage.navigateToOnlineHesapOzeti();
-        onlineHesapOzetiPage.login("kemal.yapici@elogo.com.tr", "Kemal.12345");
-        onlineHesapOzetiPage.verifyLoginSuccess();
+    @BeforeMethod
+    public void setUp() {
+        if (testMode.equals("WINDOWS")) {
+            winDriver = DriverFactory.getWinDriver();
+            System.out.println("Windows uygulaması başlatıldı.");
+        } else if (testMode.equals("WEB")) {
+            webDriver = DriverFactory.getWebDriver();
+            System.out.println("Web tarayıcı başlatıldı.");
+        } else {
+            throw new IllegalStateException("Geçersiz test modu: " + testMode);
+        }
     }
 
-    @AfterEach
+    @AfterMethod
     public void tearDown() {
-        // Testten sonra driver'ları kapat
-        DriverFactory.closeDrivers();
+        DriverFactory.quitDriver();
+        System.out.println("Test ortamı temizlendi.");
+    }
+
+    public void setTestMode(String mode) {
+        this.testMode = mode;
+        DriverFactory.setTestMode(mode);
     }
 }

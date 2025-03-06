@@ -7,20 +7,14 @@ import utils.DriverFactory;
 public class LoginPage {
     private WindowsDriver driver;
 
-    // Element locators
-    private final By usernameField = By.name("Kullanıcı");
-    private final By passwordField = By.name("Şifre");
-    private final By companyField = By.name("Firma");
-    private final By loginButton = By.name("Giriş Yap");
-
     public LoginPage() {
-        this.driver = DriverFactory.getWinDriver();
+        this.driver = DriverFactory.getWinDriver(); // ✅ Doğru metod adı
     }
 
-    public void login(String username, String password, String company) {
-        driver.findElement(usernameField).sendKeys(username);
-        driver.findElement(passwordField).sendKeys(password);
-        driver.findElement(companyField).sendKeys(company);
-        driver.findElement(loginButton).click();
+    public void login(String username, String password, String firma) {
+        driver.findElement(By.name("Kullanıcı")).sendKeys(username);
+        driver.findElement(By.name("Şifre")).sendKeys(password);
+        driver.findElement(By.name("Firma")).sendKeys(firma);
+        driver.findElement(By.name("Giriş Yap")).click();
     }
 }

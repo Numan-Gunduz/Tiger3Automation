@@ -1,4 +1,5 @@
-Feature: Tiger3 Login ve Online Hesap Özeti Bağlantısı
+Feature: Kullanıcı Girişi
 
-  Scenario: Kullanıcı giriş yaptıktan sonra ana sayfayı görmelidir
-    Then Kullanıcı Online Hesap Özeti ana sayfasını görmelidir
+  Scenario: Kullanıcı Tiger3Enterprise ve Online Hesap Özeti'ne giriş yapar
+    Given kullanıcı Windows uygulamasını açar ve giriş yapar
+    And kullanıcı Online Hesap Özeti uygulamasına giriş yapar

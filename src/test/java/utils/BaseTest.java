@@ -7,30 +7,16 @@ import org.testng.annotations.BeforeMethod;
 
 public class BaseTest {
     protected WindowsDriver winDriver;
-    protected WebDriver webDriver;
-    protected String testMode = "WINDOWS"; // Default olarak Windows modunda başlat.
 
     @BeforeMethod
     public void setUp() {
-        if (testMode.equals("WINDOWS")) {
-            winDriver = DriverFactory.getWinDriver();
-            System.out.println("Windows uygulaması başlatıldı.");
-        } else if (testMode.equals("WEB")) {
-            webDriver = DriverFactory.getWebDriver();
-            System.out.println("Web tarayıcı başlatıldı.");
-        } else {
-            throw new IllegalStateException("Geçersiz test modu: " + testMode);
-        }
+        winDriver = DriverFactory.getWinDriver(); // ✅ Doğru metod adı kullanıldı
+        System.out.println("Windows uygulaması başlatıldı.");
     }
 
     @AfterMethod
     public void tearDown() {
         DriverFactory.quitDriver();
-        System.out.println("Test ortamı temizlendi.");
-    }
-
-    public void setTestMode(String mode) {
-        this.testMode = mode;
-        DriverFactory.setTestMode(mode);
+        System.out.println("Windows uygulaması kapatıldı.");
     }
 }

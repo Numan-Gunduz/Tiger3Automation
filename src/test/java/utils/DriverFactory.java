@@ -10,17 +10,16 @@ public class DriverFactory {
 
     private static WindowsDriver winDriver;
 
-    // ERP (Windows) uygulamasını başlatır
     public static WindowsDriver startERPApplication() {
         if (winDriver == null) {
             try {
                 DesiredCapabilities caps = new DesiredCapabilities();
-                caps.setCapability("app", ConfigReader.get("erpPath"));
-                caps.setCapability("platformName", "Windows");
-                caps.setCapability("deviceName", "WindowsPC");  // Bu satır önemli!
+                caps.setCapability("appium:app", ConfigReader.get("erpPath")); // appium:app olması önemli!
+                caps.setCapability("appium:deviceName", "WindowsPC");
+                caps.setCapability("appium:platformName", "Windows");
+                caps.setCapability("appium:automationName", "Windows");
 
                 winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), caps);
-                System.out.println("✅ ERP uygulaması başarıyla başlatıldı.");
             } catch (Exception e) {
                 throw new RuntimeException("❌ ERP uygulaması başlatılamadı.", e);
             }

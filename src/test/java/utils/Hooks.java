@@ -1,47 +1,44 @@
 package utils;
 
+import base.TestContext;
 import io.appium.java_client.windows.WindowsDriver;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 public class Hooks {
-    private WindowsDriver driver;
+
+    private final TestContext context;
+
+    public Hooks(TestContext context) {
+        this.context = context;
+    }
 
     @Before
     public void setUp() {
-        System.out.println("Tiger3Enterprise uygulaması açılıyor...");
+        // 1. ERP uygulamasını aç
+        WindowsDriver winDriver = DriverFactory.startERPApplication();
+        context.setWinDriver(winDriver);
+        System.out.println("✅ Windows uygulaması başlatıldı.");
 
-        // ✅ Doğru metodu çağırıyoruz
-        driver = DriverFactory.getWinDriver();
+        // 2. Login ekranı → kullanıcı adı ve şifre gir
+        winDriver.findElement(By.name("Kullanıcı Adı")).sendKeys("logo");
+        winDriver.findElement(By.name("Şifre")).sendKeys("logo");
+        winDriver.findElement(By.name("Giriş")).click();
+        System.out.println("✅ Kullanıcı giriş yaptı.");
 
-        // ✅ findElementByName yerine findElement(By.name()) kullanıyoruz
-        driver.findElement(By.name("Kullanıcı")).sendKeys("logo");
-        driver.findElement(By.name("Şifre")).sendKeys("logo");
-        driver.findElement(By.name("Firma")).sendKeys("1");
+        // 3. Menüden "Online Hesap Özeti" modülünü aç
+        DriverFactory.openModule(winDriver, "Online Hesap Özeti");
+        System.out.println("✅ Online Hesap Özeti modülü açıldı.");
 
-        WebElement loginButton = driver.findElement(By.name("Giriş Yap"));
-        loginButton.click();
-        System.out.println("Giriş başarılı!");
-
-        // ✅ Online Hesap Özeti açma
-        WebElement onlineHesapOzetiButton = driver.findElement(By.name("Online Hesap Özeti"));
-        onlineHesapOzetiButton.click();
-        System.out.println("Online Hesap Özeti açıldı!");
-
-        // ✅ Yeni ekranda giriş yap
-        driver.findElement(By.name("Kullanıcı adı veya e-posta")).sendKeys("kemal.yapici@elogo.com.tr");
-        driver.findElement(By.name("Şifre")).sendKeys("Kemal.12345");
-
-        WebElement onlineLoginButton = driver.findElement(By.name("Giriş"));
-        onlineLoginButton.click();
-        System.out.println("Online Hesap Özeti giriş başarılı!");
+        // 4. Açılan pencerede Eho bilgileri ile giriş yapılacaksa burada olabilir
+        // WebDriver webDriver = DriverFactory.startWebApp(); → Gerekirse ekle
+        // context.setWebDriver(webDriver);
     }
 
     @After
     public void tearDown() {
-        System.out.println("Tiger3Enterprise uygulaması kapatılıyor...");
-        DriverFactory.quitDriver();
+        DriverFactory.cleanupDrivers(context);
+        System.out.println("🧹 Tüm driverlar kapatıldı.");
     }
 }

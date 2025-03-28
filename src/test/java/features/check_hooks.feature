@@ -1,4 +1,6 @@
-Feature: Hooks kontrolü
+
+  @YetkiYonetimi
+  Feature: Hooks kontrolü
 
   Scenario: Test başlangıcı ve sonu kontrol edilir
     Given sistem hazır

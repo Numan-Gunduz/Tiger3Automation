@@ -14,8 +14,7 @@ import io.cucumber.testng.CucumberOptions;
                 "html:target/cucumber-reports.html",              // HTML rapor
                 "json:target/cucumber.json"                       // JSON rapor (isteğe bağlı)
         },
-        monochrome = true,
-        dryRun = false
+        tags = "@YetkiYonetimi",        dryRun = false
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
 }

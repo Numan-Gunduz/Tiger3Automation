@@ -20,12 +20,20 @@ public class Hooks {
         context.setWinDriver(winDriver);
         System.out.println("✅ ERP uygulaması başlatıldı.");
 
-        // ERP giriş işlemleri burada yapılabilir:
-        winDriver.findElement(By.name("Kullanıcı Adı")).sendKeys("logo");
-        winDriver.findElement(By.name("Şifre")).sendKeys("logo");
-        winDriver.findElement(By.name("Giriş")).click();
-        System.out.println("✅ ERP giriş başarılı.");
+        try {
+            Thread.sleep(10000); // uygulamanın tam yüklenmesini bekle
+
+            winDriver.findElement(By.name("Kullanıcı Adı")).sendKeys("logo");
+            winDriver.findElement(By.name("Şifre")).sendKeys("logo");
+            winDriver.findElement(By.name("Giriş")).click();
+
+            System.out.println("✅ ERP giriş başarılı.");
+
+        } catch (Exception e) {
+            throw new RuntimeException("❌ ERP giriş yapılırken hata oluştu: " + e.getMessage(), e);
+        }
     }
+
 
     @After
     public void tearDown() {

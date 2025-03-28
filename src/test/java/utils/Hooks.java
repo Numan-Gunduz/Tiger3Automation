@@ -16,7 +16,7 @@ public class Hooks {
 
     @Before
     public void setUp() {
-        WindowsDriver winDriver = DriverFactory.startERPApplication();
+        WindowsDriver winDriver = DriverFactory.getWinDriver();
         context.setWinDriver(winDriver);
         System.out.println("✅ ERP uygulaması başlatıldı.");
 
@@ -29,6 +29,6 @@ public class Hooks {
 
     @After
     public void tearDown() {
-        DriverFactory.cleanupDrivers();
+        DriverFactory.quitDriver();
     }
 }

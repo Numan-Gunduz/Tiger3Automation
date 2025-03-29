@@ -1,24 +1,22 @@
 package utils;
 
-
 import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.WebElement;
-
-import io.appium.java_client.windows.options.WindowsOptions;
-import io.appium.java_client.AppiumBy;
-
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Scanner;
-import java.util.Set;
+
+import static java.time.Duration.ofSeconds;
 
 public class DriverFactory {
 
     private static WindowsDriver winDriver;
+
     private static Process winAppDriverProcess;
 
     private static void startWinAppDriver() {
@@ -34,6 +32,17 @@ public class DriverFactory {
             throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
         }
     }
+
+    private static void startERPApplication() {
+        try {
+            new ProcessBuilder("cmd.exe", "/c", "start /min C:\\Tiger\\Protset\\Tiger3Enterprise.exe").start();
+            Thread.sleep(20000); // uygulamanın açılmasını bekle
+            System.out.println("🚀 ERP uygulaması başlatıldı.");
+        } catch (Exception e) {
+            throw new RuntimeException("❌ ERP uygulaması başlatılamadı: " + e.getMessage(), e);
+        }
+    }
+
     private static String getERPWindowHandle(String windowTitleKeyword) {
         try {
             ProcessBuilder builder = new ProcessBuilder("powershell.exe",
@@ -53,38 +62,32 @@ public class DriverFactory {
             }
 
             System.out.println("🔑 Handle bulundu: " + handle);
-            return handle; // Artık HEX değil, DECIMAL olarak dönüyoruz
+            return handle;
         } catch (Exception e) {
             throw new RuntimeException("❌ ERP pencere handle alınamadı (PowerShell): " + e.getMessage(), e);
         }
     }
 
-
-
-
     private static void attachToRunningERP() {
         try {
-            String erpHandle = getERPWindowHandle("TIGER 3 ENTERPRISE");
-
-            if (erpHandle != null && !erpHandle.isEmpty()) {
-                while (erpHandle.length() < 8) {
-                    erpHandle = "0" + erpHandle;
-                }
-                erpHandle = erpHandle.toUpperCase();
+            String handle = getERPWindowHandle("TIGER 3 ENTERPRISE");
+            String hexHandle = Long.toHexString(Long.parseLong(handle)).toUpperCase();
+            while (hexHandle.length() < 8) {
+                hexHandle = "0" + hexHandle;
             }
+            hexHandle = "0x" + hexHandle;
+            System.out.println("✅ Final handle (hex): " + hexHandle);
 
-            System.out.println("✅ Final handle (hex): " + erpHandle);
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+            capabilities.setCapability("appTopLevelWindow", hexHandle);
+            capabilities.setCapability("automationName", "Windows");
+            capabilities.setCapability("deviceName", "WindowsPC");
+            capabilities.setCapability("platformName", "Windows");
 
-            WindowsOptions options = new WindowsOptions();
-            options.setCapability("appTopLevelWindow", erpHandle);
-            options.setPlatformName("Windows");
-            options.setAutomationName("Windows");
-            options.setCapability("deviceName", "WindowsPC");
+            winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), capabilities);
+            winDriver.manage().timeouts().implicitlyWait(10, java.util.concurrent.TimeUnit.SECONDS);
 
-            winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), options);
-            winDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-            System.out.println("✅ ERP uygulamasına başarıyla bağlanıldı.");
-
+//            winDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
             System.out.println("✅ ERP uygulamasına başarıyla bağlanıldı.");
         } catch (Exception e) {
@@ -93,16 +96,15 @@ public class DriverFactory {
     }
 
 
-
-
     public static WindowsDriver getWinDriver() {
         if (winDriver == null) {
             startWinAppDriver();
-            // startERPApplication();
+            startERPApplication();
             attachToRunningERP();
         }
-        return winDriver;
+        return (WindowsDriver) winDriver;
     }
+
 
     public static void quitDriver() {
         if (winDriver != null) {
@@ -121,23 +123,3 @@ public class DriverFactory {
         }
     }
 }
-
-//    private static void startERPApplication() {
-//        try {
-//            new ProcessBuilder("C:\\Tiger\\Protset\\Tiger3Enterprise.exe").start();
-//            Thread.sleep(15000); // ERP'nin açılması için bekle
-//
-//            String erpHandle = getERPWindowHandle("TIGER 3 ENTERPRISE");
-//
-//            WindowsOptions options = new WindowsOptions();
-//            options.setCapability("appTopLevelWindow", erpHandle);
-//            options.setPlatformName("Windows");          // Burası büyük W ile yazılmalı.
-//            options.setAutomationName("Windows");
-//
-//            winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), options);
-//            winDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-//            System.out.println("✅ ERP uygulaması başarıyla başlatıldı.");
-//        } catch (Exception e) {
-//            throw new RuntimeException("❌ ERP uygulaması başlatılırken hata oluştu: " + e.getMessage(), e);
-//        }
-//    }

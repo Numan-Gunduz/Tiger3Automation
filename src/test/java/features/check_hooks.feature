@@ -1,5 +1,5 @@
 
-  @YetkiYonetimi
+  @checkHooks
   Feature: Hooks kontrolü
 
   Scenario: Test başlangıcı ve sonu kontrol edilir

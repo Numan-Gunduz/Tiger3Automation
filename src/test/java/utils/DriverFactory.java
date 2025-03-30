@@ -95,7 +95,7 @@ public class DriverFactory {
         }
     }
 
-
+//sğrüm  kontrolü
     public static WindowsDriver getWinDriver() {
         if (winDriver == null) {
             startWinAppDriver();

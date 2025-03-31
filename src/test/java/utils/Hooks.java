@@ -1,9 +1,10 @@
 package utils;
 
-import io.appium.java_client.windows.WindowsDriver;
 import io.appium.java_client.MobileBy;
-import io.cucumber.java.Before;
+import io.appium.java_client.windows.WindowsDriver;
+import io.appium.java_client.windows.WindowsElement;
 import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import org.openqa.selenium.WebElement;
 
 public class Hooks {
@@ -13,9 +14,8 @@ public class Hooks {
         WindowsDriver driver = DriverFactory.getWinDriver();
 
         try {
-            Thread.sleep(5000); // Uygulamanın iyice yüklenmesi için daha fazla bekle
+            Thread.sleep(5000); // Uygulamanın giriş ekranının tam yüklenmesini bekle
 
-            // Mevcut tüm pencereleri dönerek doğru handle'ı bulmaya çalış
             boolean elementFound = false;
             for (String handle : driver.getWindowHandles()) {
                 driver.switchTo().window(handle);
@@ -27,30 +27,32 @@ public class Hooks {
             }
 
             if (!elementFound) {
-                throw new RuntimeException("❌ 'EdtCode' elementi hiçbir handle içinde bulunamadı.");
+                DriverFactory.logAllWindowTitles();
+                throw new RuntimeException("❌ 'EdtCode' elementi bulunamadı. Muhtemelen pencere aktif değil.");
             }
 
-            Thread.sleep(1000); // Login alanlarının oturması için kısa bekleme
+            Thread.sleep(1000);
 
-            WebElement kullaniciAdi = driver.findElement(MobileBy.AccessibilityId("EdtCode"));
+            WindowsElement kullaniciAdi = (WindowsElement) driver.findElement(MobileBy.AccessibilityId("EdtCode"));
             kullaniciAdi.clear();
             kullaniciAdi.sendKeys("LOGO");
 
-            WebElement sifre = driver.findElement(MobileBy.AccessibilityId("EdtCyp"));
+            WindowsElement sifre = (WindowsElement) driver.findElement(MobileBy.AccessibilityId("EdtCyp"));
             sifre.clear();
             sifre.sendKeys("LOGO");
 
-            WebElement firma = driver.findElement(MobileBy.AccessibilityId("EdtNum"));
+            WindowsElement firma = (WindowsElement) driver.findElement(MobileBy.AccessibilityId("EdtNum"));
             firma.clear();
             firma.sendKeys("1");
 
             WebElement girisYap = driver.findElement(MobileBy.name("Giriş Yap"));
             girisYap.click();
 
-            System.out.println("✅ ERP giriş işlemi başarılı.");
+            System.out.println("✅ ERP giriş başarılı.");
 
         } catch (Exception e) {
-            throw new RuntimeException("❌ ERP giriş yapılırken hata oluştu: " + e.getMessage(), e);
+            DriverFactory.logAllWindowTitles();
+            throw new RuntimeException("❌ ERP girişi sırasında hata: " + e.getMessage(), e);
         }
     }
 

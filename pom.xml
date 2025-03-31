@@ -46,6 +46,19 @@
             <version>2.0.5</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.13.0</version> <!-- veya son stabil versiyon -->
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>5.13.0</version> <!-- aynı versiyonda olmalı -->
+        </dependency>
+
+
+
 
 
         <!-- Jackson JSON Parser (kararlı) -->

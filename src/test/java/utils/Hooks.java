@@ -1,3 +1,4 @@
+// Hooks.java
 package utils;
 
 import io.appium.java_client.MobileBy;
@@ -14,34 +15,26 @@ public class Hooks {
         WindowsDriver driver = DriverFactory.getWinDriver();
 
         try {
-            Thread.sleep(5000); // Uygulamanın giriş ekranının tam yüklenmesini bekle
+            Thread.sleep(5000);
 
-            boolean elementFound = false;
-            for (String handle : driver.getWindowHandles()) {
-                driver.switchTo().window(handle);
-                try {
-                    WebElement test = driver.findElement(MobileBy.AccessibilityId("EdtCode"));
-                    elementFound = true;
-                    break;
-                } catch (Exception ignored) {}
-            }
-
-            if (!elementFound) {
+            System.out.println("🔍 'EdtCode' elementi aranıyor...");
+            WebElement kullaniciAdi;
+            try {
+                kullaniciAdi = driver.findElement(MobileBy.AccessibilityId("EdtCode"));
+            } catch (Exception e) {
+                System.out.println("❌ 'EdtCode' elementi bulunamadı.");
                 DriverFactory.logAllWindowTitles();
-                throw new RuntimeException("❌ 'EdtCode' elementi bulunamadı. Muhtemelen pencere aktif değil.");
+                throw e;
             }
 
-            Thread.sleep(1000);
-
-            WindowsElement kullaniciAdi = (WindowsElement) driver.findElement(MobileBy.AccessibilityId("EdtCode"));
             kullaniciAdi.clear();
             kullaniciAdi.sendKeys("LOGO");
 
-            WindowsElement sifre = (WindowsElement) driver.findElement(MobileBy.AccessibilityId("EdtCyp"));
+            WebElement sifre = driver.findElement(MobileBy.AccessibilityId("EdtCyp"));
             sifre.clear();
             sifre.sendKeys("LOGO");
 
-            WindowsElement firma = (WindowsElement) driver.findElement(MobileBy.AccessibilityId("EdtNum"));
+            WebElement firma = driver.findElement(MobileBy.AccessibilityId("EdtNum"));
             firma.clear();
             firma.sendKeys("1");
 
@@ -51,8 +44,8 @@ public class Hooks {
             System.out.println("✅ ERP giriş başarılı.");
 
         } catch (Exception e) {
-            DriverFactory.logAllWindowTitles();
-            throw new RuntimeException("❌ ERP girişi sırasında hata: " + e.getMessage(), e);
+            System.out.println("❌ ERP girişi sırasında beklenmeyen hata: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

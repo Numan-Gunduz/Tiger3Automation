@@ -3,10 +3,14 @@ package utils;
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
-import io.appium.java_client.windows.WindowsElement;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class Hooks {
 
@@ -15,36 +19,54 @@ public class Hooks {
         WindowsDriver driver = DriverFactory.getWinDriver();
 
         try {
-            Thread.sleep(5000);
+            System.out.println("📋 Giriş ekranı kontrol ediliyor...");
+            WebDriverWait wait = new WebDriverWait(driver, 15);
 
-            System.out.println("🔍 'EdtCode' elementi aranıyor...");
-            WebElement kullaniciAdi;
+            // Kullanıcı alanı varsa doldur, yoksa zaten doludur diye devam et
             try {
-                kullaniciAdi = driver.findElement(MobileBy.AccessibilityId("EdtCode"));
+                WebElement kullaniciAdi = wait.until(ExpectedConditions.presenceOfElementLocated(
+                        MobileBy.AccessibilityId("EdtCode")));
+
+                if (kullaniciAdi.isEnabled() && kullaniciAdi.isDisplayed()) {
+                    System.out.println("🧑‍💼 Kullanıcı adı alanı bulundu. Temizleniyor...");
+                    kullaniciAdi.click();
+                    kullaniciAdi.sendKeys(Keys.CONTROL + "a");
+                    kullaniciAdi.sendKeys(Keys.DELETE);
+                    kullaniciAdi.sendKeys("LOGO");
+                } else {
+                    System.out.println("ℹ️ 'EdtCode' alanı pasif durumda, zaten otomatik dolu olabilir.");
+                }
             } catch (Exception e) {
-                System.out.println("❌ 'EdtCode' elementi bulunamadı.");
-                DriverFactory.logAllWindowTitles();
-                throw e;
+                System.out.println("⚠️ Kullanıcı seçimi bulunamadı veya otomatik seçildi: " + e.getMessage());
             }
 
-            kullaniciAdi.clear();
-            kullaniciAdi.sendKeys("LOGO");
-
-            WebElement sifre = driver.findElement(MobileBy.AccessibilityId("EdtCyp"));
-            sifre.clear();
+            // Şifre alanı
+            WebElement sifre = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    MobileBy.AccessibilityId("EdtCyp")));
+            sifre.click();
+            sifre.sendKeys(Keys.CONTROL + "a");
+            sifre.sendKeys(Keys.DELETE);
             sifre.sendKeys("LOGO");
 
-            WebElement firma = driver.findElement(MobileBy.AccessibilityId("EdtNum"));
-            firma.clear();
+// Firma numarası
+            WebElement firma = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    MobileBy.AccessibilityId("EdtNum")));
+            firma.click();
+            firma.sendKeys(Keys.CONTROL + "a");
+            firma.sendKeys(Keys.DELETE);
             firma.sendKeys("1");
 
-            WebElement girisYap = driver.findElement(MobileBy.name("Giriş Yap"));
+            // Giriş Yap butonu
+            WebElement girisYap = wait.until(ExpectedConditions.elementToBeClickable(
+                    MobileBy.name("Giriş Yap")));
             girisYap.click();
 
             System.out.println("✅ ERP giriş başarılı.");
 
         } catch (Exception e) {
-            System.out.println("❌ ERP girişi sırasında beklenmeyen hata: " + e.getMessage());
+            System.out.println("❌ ERP girişi sırasında hata oluştu: " + e.getMessage());
+            System.out.println("🔍 Mevcut açık pencereler listeleniyor...");
+            DriverFactory.logAllWindowTitles();
             throw new RuntimeException(e);
         }
     }

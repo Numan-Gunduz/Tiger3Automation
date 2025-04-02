@@ -4,85 +4,69 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import utils.ElementHelper;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.KeyEvent;
+import java.time.Duration;
 
 public class LoginPageOnlineOzet {
 
     private final WindowsDriver driver;
+    private final WebDriverWait wait;
 
     public LoginPageOnlineOzet(WindowsDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver,10);
     }
 
     public void login(String username, String password) {
-        WebDriverWait wait = new WebDriverWait(driver, 15);
-
         try {
-            // 1. Pencereyi öne getir (gerekirse)
-            WebElement rootElement = driver.findElement(MobileBy.xpath("//Window"));
-            String windowTitle = rootElement.getAttribute("Name");
-            ElementHelper.switchToWindowByTitle(windowTitle);
-
-            // 2. Maximize butonuna tıkla (pencereyi büyüt)
-            WebElement maximizeBtn = driver.findElement(MobileBy.AccessibilityId("pcMaximize"));
-            maximizeBtn.click();
+            // 1. Sayfayı büyüt (robot değil, öğe üzerinden)
+            WebElement maximizeButton = driver.findElement(MobileBy.AccessibilityId("pcMaximize"));
+            maximizeButton.click();
             System.out.println("🖥️ Ekran büyütüldü.");
 
-            // 3. Kullanıcı adı alanını doldur
+            // 2. Kullanıcı adını clipboard ile gir
             WebElement usernameField = wait.until(ExpectedConditions.presenceOfElementLocated(
                     MobileBy.AccessibilityId("UserName")));
+
             usernameField.click();
-            usernameField.sendKeys(Keys.CONTROL + "a");
-            usernameField.sendKeys(Keys.DELETE);
+            usernameField.clear();
+            Thread.sleep(500);
 
-            setClipboardData(username); // panoya mail adresini at
-            pasteFromClipboard();       // yapıştır (autocomplete tetiklemez)
-            System.out.println("🧑‍💼 Kullanıcı adı yapıştırıldı.");
+            // Clipboard ile kopyalama
+            StringSelection selection = new StringSelection(username);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
 
-            // 4. Şifre
-// 4. Şifre
-            WebElement passwordField = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    MobileBy.AccessibilityId("Password")));
-            passwordField.click();
-            passwordField.sendKeys(Keys.CONTROL + "a");
-            passwordField.sendKeys(Keys.DELETE);
+            Actions actions = new Actions(driver);
+            actions.keyDown(Keys.CONTROL).sendKeys("v").keyUp(Keys.CONTROL).perform();
+
+            System.out.println("🧑‍💼 Kullanıcı adı yapıştırıldı."+username);
+
+            // 3. Şifre
+            WebElement passwordField = driver.findElement(MobileBy.AccessibilityId("Password"));
             passwordField.sendKeys(password);
-            System.out.println("🔐 Şifre alanı dolduruldu."+password);
+            System.out.println("🔐 Şifre alanı dolduruldu." + password);
 
-
-            // 5. Giriş butonuna tıkla
-            WebElement loginBtn = driver.findElement(MobileBy.AccessibilityId("loginBtn"));
-            loginBtn.click();
-
+            // 4. Giriş
+            WebElement loginButton = driver.findElement(MobileBy.AccessibilityId("loginBtn"));
+            loginButton.click();
             System.out.println("✅ Giriş işlemi tamamlandı.");
-        } catch (Exception e) {
-            System.out.println("❌ Login sırasında hata oluştu: " + e.getMessage());
-        }
-    }
 
-    // --- Yardımcı metodlar ---
-    private void setClipboardData(String string) {
-        StringSelection stringSelection = new StringSelection(string);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-    }
+            // 5. Hatalı giriş kontrolü
+            Thread.sleep(2000);
+            boolean loginWarning = driver.getPageSource().contains("Kullanıcı adı ya da şifre hatalı");
+            if (loginWarning) {
+                System.out.println("❌ Hatalı giriş uyarısı görüldü! Kullanıcı adı veya şifre yanlış olabilir.");
+            } else {
+                System.out.println("✅ Giriş başarılı, uyarı mesajı yok.");
+            }
 
-    private void pasteFromClipboard() {
-        try {
-            Robot robot = new Robot();
-            robot.delay(300);
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_V);
-            robot.keyRelease(KeyEvent.VK_V);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            robot.delay(300);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("⚠️ Login sırasında hata oluştu: " + e.getMessage());
         }
     }
 }

@@ -1,16 +1,23 @@
 // Hooks.java
 package utils;
 
+import base.TestContext;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.LoginPageOnlineOzet;
 
+
+import java.net.URL;
 import java.time.Duration;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class Hooks {
 
@@ -85,8 +92,25 @@ public class Hooks {
         öho.click();
         System.out.println("✅ 'Online Hesap Özeti Uygulaması' tıklandı.");
 
+        try {
+            System.out.println("⏳ Giriş sonrası bekleniyor...");
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        ElementHelper.switchToWindowByTitle("Online Hesap Özeti Uygulaması");
+        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
+        loginPage.login("kemal.yapici@elogo.com.tr", "Kemal.12345");
+
+//
+//        TestContext testContext = new TestContext();
+//        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
+//        loginPage.login("kemal.yapici@elogo.com.tr", "Kemal.12345");
 
     }
+
+
 
 
 

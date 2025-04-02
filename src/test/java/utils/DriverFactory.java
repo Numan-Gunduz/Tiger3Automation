@@ -28,25 +28,27 @@ public class DriverFactory {
         }, null);
     }
 
-    private static void startWinAppDriver() {
-        try {
-            if (winAppDriverProcess == null || !winAppDriverProcess.isAlive()) {
-                String command = "cmd.exe /c start cmd /k \"cd /d C:\\Program Files (x86)\\Windows Application Driver && WinAppDriver.exe\"";
-                winAppDriverProcess = new ProcessBuilder("cmd.exe", "/c", command).start();
-                Thread.sleep(5000);
-                System.out.println("\uD83D\uDE80 WinAppDriver terminal penceresinde başlatıldı (manuel kapatmalısın).");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
-        }
-    }
+//    private static void startWinAppDriver() {
+//        try {
+//            if (winAppDriverProcess == null || !winAppDriverProcess.isAlive()) {
+//                String command = "Start-Process \"C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe\" -Verb runAs";
+//                winAppDriverProcess = new ProcessBuilder("powershell.exe", "-Command", command).start();
+//                Thread.sleep(5000);
+//                System.out.println("🚀 WinAppDriver yönetici olarak başlatıldı.");
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
+//        }
+//    }
+
 
 //    private static void startERPApplication() {
 //        try {
-//            new ProcessBuilder("cmd.exe", "/c", "start /min C:\\Tiger\\Protset\\Tiger3Enterprise.exe").start();
-//            System.out.println("⏳ ERP uygulaması açılıyor, 15 saniye bekleniyor...");
+//            String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";
+//            new ProcessBuilder("powershell.exe", "-Command", command).start();
+//            System.out.println("⏳ ERP uygulaması yönetici olarak açılıyor, 15 saniye bekleniyor...");
 //            Thread.sleep(15000);
-//            System.out.println("\uD83D\uDE80 ERP uygulaması başlatıldı.");
+//            System.out.println("🚀 ERP uygulaması başlatıldı.");
 //        } catch (Exception e) {
 //            throw new RuntimeException("❌ ERP uygulaması başlatılamadı: " + e.getMessage(), e);
 //        }
@@ -101,8 +103,8 @@ public class DriverFactory {
 
     public static WindowsDriver getWinDriver() {
         if (winDriver == null) {
-           // startWinAppDriver();
-          //  startERPApplication();
+//            startWinAppDriver();
+//            startERPApplication();
             return attachToRunningERP();
         }
         return winDriver;

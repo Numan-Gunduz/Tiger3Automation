@@ -69,7 +69,26 @@ public class Hooks {
             DriverFactory.logAllWindowTitles();
             throw new RuntimeException(e);
         }
+
+        // 🕒 Giriş sonrası 8 saniye bekleme
+        try {
+            System.out.println("⏳ Giriş sonrası bekleniyor...");
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        WebElement öho = wait.until(ExpectedConditions.elementToBeClickable(
+                MobileBy.name("Online Hesap Özeti Uygulaması")));
+        öho.click();
+        System.out.println("✅ 'Online Hesap Özeti Uygulaması' tıklandı.");
+
+
     }
+
+
 
     @After
     public void tearDown() {

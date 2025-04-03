@@ -1,16 +1,13 @@
-package pages;
 
+
+package pages;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.time.Duration;
+import java.awt.event.KeyEvent;
 
 public class LoginPageOnlineOzet {
 
@@ -19,39 +16,37 @@ public class LoginPageOnlineOzet {
 
     public LoginPageOnlineOzet(WindowsDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver,10);
+        this.wait = new WebDriverWait(driver, 10);
     }
 
-    public void login(String username, String password) {
+
+
+
+    public void loginWithRobot(String username, String password) {
         try {
-            // 1. Sayfayı büyüt (robot değil, öğe üzerinden)
+            // 1. Sayfayı büyüt
             WebElement maximizeButton = driver.findElement(MobileBy.AccessibilityId("pcMaximize"));
             maximizeButton.click();
             System.out.println("🖥️ Ekran büyütüldü.");
 
-            // 2. Kullanıcı adını clipboard ile gir
+            // 2. Kullanıcı adı alanını bul ve odaklan
             WebElement usernameField = wait.until(ExpectedConditions.presenceOfElementLocated(
                     MobileBy.AccessibilityId("UserName")));
-
             usernameField.click();
             usernameField.clear();
-            Thread.sleep(500);
+            Thread.sleep(300);
+            usernameField.click();
+            System.out.println("🧑‍💼 Kullanıcı adı alanı bulundu, yazılıyor...");
+            typeTextWithRobot(username);
 
-            // Clipboard ile kopyalama
-            StringSelection selection = new StringSelection(username);
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
+            // 3. Şifre alanını bul ve tıkla
+            WebElement passwordField = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    MobileBy.AccessibilityId("Password")));
+            passwordField.click();
+            System.out.println("🔐 Şifre alanı bulundu, yazılıyor...");
+            typeTextWithRobot(password);
 
-            Actions actions = new Actions(driver);
-            actions.keyDown(Keys.CONTROL).sendKeys("v").keyUp(Keys.CONTROL).perform();
-
-            System.out.println("🧑‍💼 Kullanıcı adı yapıştırıldı."+username);
-
-            // 3. Şifre
-            WebElement passwordField = driver.findElement(MobileBy.AccessibilityId("Password"));
-            passwordField.sendKeys(password);
-            System.out.println("🔐 Şifre alanı dolduruldu." + password);
-
-            // 4. Giriş
+            // 4. Giriş butonuna tıkla
             WebElement loginButton = driver.findElement(MobileBy.AccessibilityId("loginBtn"));
             loginButton.click();
             System.out.println("✅ Giriş işlemi tamamlandı.");
@@ -69,4 +64,49 @@ public class LoginPageOnlineOzet {
             System.out.println("⚠️ Login sırasında hata oluştu: " + e.getMessage());
         }
     }
+
+    private void typeTextWithRobot(String text) {
+        try {
+            Robot robot = new Robot();
+            for (char c : text.toCharArray()) {
+                typeChar(robot, c);
+                Thread.sleep(100);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void typeChar(Robot robot, char c) {
+        try {
+            switch (c) {
+                case '@':
+                    robot.keyPress(KeyEvent.VK_ALT_GRAPH); // ALT GR (ALT + CTRL)
+                    robot.keyPress(KeyEvent.VK_Q);
+                    robot.keyRelease(KeyEvent.VK_Q);
+                    robot.keyRelease(KeyEvent.VK_ALT_GRAPH);
+                    break;
+                case '.':
+                    robot.keyPress(KeyEvent.VK_PERIOD);
+                    robot.keyRelease(KeyEvent.VK_PERIOD);
+                    break;
+                default:
+                    boolean upperCase = Character.isUpperCase(c);
+                    int keyCode = KeyEvent.getExtendedKeyCodeForChar(c);
+
+                    if (upperCase) robot.keyPress(KeyEvent.VK_SHIFT);
+
+                    robot.keyPress(keyCode);
+                    robot.keyRelease(keyCode);
+
+                    if (upperCase) robot.keyRelease(KeyEvent.VK_SHIFT);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("⚠️ Yazılamayan karakter: " + c);
+        }
+    }
+
 }
+
+
+

@@ -90,10 +90,15 @@ public class Hooks {
             throw new RuntimeException(e);
         }
 
-        ElementHelper.switchToWindowByTitle("Online Hesap Özeti Uygulaması");
-        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
-        loginPage.loginWithRobot("kemal.yapici@elogo.com.tr", "Kemal.12345");
+//        ElementHelper.switchToWindowByTitle("Online Hesap Özeti Uygulaması");
+//        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
+//        loginPage.loginWithRobot("kemal.yapici@elogo.com.tr", "Kemal.12345");
 
+
+        ElementHelper.switchToWindowByTitle("Online Hesap Özeti Uygulaması");
+
+        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
+        loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.12345");
 
     }
 

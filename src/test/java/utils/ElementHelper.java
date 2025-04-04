@@ -1,10 +1,6 @@
 package utils;
-
-import base.TestContext;
 import com.sun.jna.Native;
-import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef.HWND;
-import pages.LoginPageOnlineOzet;
 
 public class ElementHelper {
 

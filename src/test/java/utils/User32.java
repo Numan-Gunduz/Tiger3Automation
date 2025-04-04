@@ -1,5 +1,4 @@
 package utils;
-
 import com.sun.jna.Callback;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;

@@ -40,8 +40,8 @@ public class DriverFactory {
 //            throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
 //        }
 //    }
-
-
+//
+//
 //    private static void startERPApplication() {
 //        try {
 //            String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";

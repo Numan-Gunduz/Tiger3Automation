@@ -8,6 +8,7 @@ import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,31 +29,52 @@ public class DriverFactory {
         }, null);
     }
 
-//    private static void startWinAppDriver() {
-//        try {
-//            if (winAppDriverProcess == null || !winAppDriverProcess.isAlive()) {
-//                String command = "Start-Process \"C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe\" -Verb runAs";
-//                winAppDriverProcess = new ProcessBuilder("powershell.exe", "-Command", command).start();
-//                Thread.sleep(5000);
-//                System.out.println("🚀 WinAppDriver yönetici olarak başlatıldı.");
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
-//        }
-//    }
-//
-//
-//    private static void startERPApplication() {
-//        try {
-//            String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";
-//            new ProcessBuilder("powershell.exe", "-Command", command).start();
-//            System.out.println("⏳ ERP uygulaması yönetici olarak açılıyor, 15 saniye bekleniyor...");
-//            Thread.sleep(15000);
-//            System.out.println("🚀 ERP uygulaması başlatıldı.");
-//        } catch (Exception e) {
-//            throw new RuntimeException("❌ ERP uygulaması başlatılamadı: " + e.getMessage(), e);
-//        }
-//    }
+    private static void startWinAppDriver() {
+        try {
+            if (winAppDriverProcess == null || !winAppDriverProcess.isAlive()) {
+                String winAppDriverPath = "C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe";
+                String command = "cmd /c start \"\" \"" + winAppDriverPath + "\"";
+                winAppDriverProcess = new ProcessBuilder("cmd.exe", "/c", command).start();
+                System.out.println("🚀 WinAppDriver başlatıldı.");
+                waitUntilWinAppDriverReady(); // Gerekirse burayı da sadeleştirebiliriz
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
+        }
+    }
+
+
+
+
+    private static void waitUntilWinAppDriverReady() {
+        int retries = 10;
+        while (retries-- > 0) {
+            try (Socket socket = new Socket("127.0.0.1", 4723)) {
+                System.out.println("✅ WinAppDriver hazır ve port dinlemede.");
+                return;
+            } catch (IOException e) {
+                System.out.println("⏳ WinAppDriver başlatılıyor, bekleniyor...");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+        throw new RuntimeException("❌ WinAppDriver zamanında başlatılamadı!");
+    }
+
+
+    private static void startERPApplication() {
+        try {
+            String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";
+            new ProcessBuilder("powershell.exe", "-Command", command).start();
+            System.out.println("⏳ ERP uygulaması yönetici olarak açılıyor, 15 saniye bekleniyor...");
+            Thread.sleep(15000);
+            System.out.println("🚀 ERP uygulaması başlatıldı.");
+        } catch (Exception e) {
+            throw new RuntimeException("❌ ERP uygulaması başlatılamadı: " + e.getMessage(), e);
+        }
+    }
 
     public static WindowsDriver attachToRunningERP() {
         try {
@@ -103,8 +125,8 @@ public class DriverFactory {
 
     public static WindowsDriver getWinDriver() {
         if (winDriver == null) {
-//            startWinAppDriver();
-//            startERPApplication();
+           startWinAppDriver();
+            startERPApplication();
             return attachToRunningERP();
         }
         return winDriver;

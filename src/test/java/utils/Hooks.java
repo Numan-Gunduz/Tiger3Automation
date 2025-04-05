@@ -92,9 +92,12 @@ public class Hooks {
 
 
         ElementHelper.switchToWindowByTitle("Online Hesap Özeti Uygulaması");
+//
+       LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
 
-        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
-        loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.12345");
+loginPage.loginIfRequired("kemal.yapici@elogo.com.tr","Kemal.12345");
+        //loginPage.loginWithRobot("kemal.yapici@elogo.com.tr", "Kemal.12345");
+
 
     }
 

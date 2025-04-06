@@ -25,9 +25,6 @@ public class ElementHelper {
         return result[0];
     }
 
-    /**
-     * Ana pencereyi ve alt pencereyi başlığa göre bulup, alt pencereyi ön plana getirir.
-     */
     public static void switchToWindowByTitle(String windowTitle) {
         System.out.println("🔍 Pencere aranıyor: " + windowTitle);
         HWND window = findWindowByExactTitle(windowTitle);

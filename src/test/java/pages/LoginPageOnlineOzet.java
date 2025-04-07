@@ -6,6 +6,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.junit.Assert;
+import utils.ElementHelper;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -13,6 +15,7 @@ public class LoginPageOnlineOzet {
 
     private final WindowsDriver driver;
     private final WebDriverWait wait;
+    ElementHelper elementHelper  = new ElementHelper();
 
     public LoginPageOnlineOzet(WindowsDriver driver) {
         this.driver = driver;
@@ -58,7 +61,8 @@ public class LoginPageOnlineOzet {
                     MobileBy.AccessibilityId("Password")));
             passwordField.click();
             Thread.sleep(200);
-            typeTextWithRobot(password);
+            ElementHelper.typeTextSmart(passwordField, password);
+            //typeTextWithRobot(password);
             System.out.println("✅ Şifre yazıldı.");
 
             // 5. Giriş butonuna tıkla

@@ -1,5 +1,6 @@
 
 package utils;
+import base.TestContext;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import io.appium.java_client.MobileBy;
@@ -8,6 +9,7 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -21,7 +23,11 @@ public class Hooks {
     private static final String DEFAULT_PASSWORD = "LOGO";
     private static final String DEFAULT_COMPANY = "1";
     private static final String APP_NAME = "Online Hesap Özeti Uygulaması";
+    private final TestContext context;
 
+    public Hooks(TestContext context) {
+        this.context = context;
+    }
     @Before
     public void setUp(Scenario scenario) {
 
@@ -32,7 +38,11 @@ public class Hooks {
         test.info("🚀 Test başlatılıyor: " + scenario.getName());
 
 
+
         WindowsDriver driver = DriverFactory.getWinDriver();
+        context.setWindowsDriver(driver); // 🔥 burada driver’ı context'e set ediyoruz
+
+
         WebDriverWait wait = new WebDriverWait(driver, 15);
 
         System.out.println("📋 Giriş ekranı kontrol ediliyor...");
@@ -51,11 +61,11 @@ public class Hooks {
         }
 
         // Online Hesap Özeti uygulamasına tıklama
-        ElementHelper.waitForElement(driver, "name", APP_NAME, 5).click();
+        ElementHelper.waitForElement(driver, "name", APP_NAME, 8).click();
         System.out.println("✅ '" + APP_NAME + "' tıklandı.");
 
         // Sadece pencere geldi mi kontrolü, içerik değil
-        ElementHelper.waitForWindowByTitle(APP_NAME, 1);
+        ElementHelper.waitForWindowByTitle(APP_NAME, 5);
         ElementHelper.switchToWindowByTitle(APP_NAME);
 
         // Login gerekiyorsa yapılır
@@ -63,7 +73,7 @@ public class Hooks {
         loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.12345");
 
         // ✅ Giriş sonrası sayfa tam yüklensin diye menüden "Ana Sayfa" bekleniyor
-        ElementHelper.waitUntilClickable(driver, "name", "Ana Sayfa", 5);
+        ElementHelper.waitUntilClickable(driver, "name", "Ana Sayfa", 15);
         System.out.println("✅ Sayfa etkileşim için hazır, testler başlıyor...");
 
     }

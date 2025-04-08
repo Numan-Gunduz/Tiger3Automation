@@ -65,7 +65,7 @@ public class DriverFactory {
             String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";
             new ProcessBuilder("powershell.exe", "-Command", command).start();
             System.out.println("⏳ ERP uygulaması başlatılıyor...");
-            Thread.sleep(14000);
+            Thread.sleep(17000);
             System.out.println("🚀 ERP uygulaması çalışıyor.");
         } catch (Exception e) {
             throw new RuntimeException("❌ ERP başlatılamadı: " + e.getMessage(), e);

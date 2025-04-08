@@ -1,6 +1,5 @@
-// DriverFactory.java
-package utils;
 
+package utils;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef;
@@ -12,50 +11,48 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static io.appium.java_client.remote.IOSMobileCapabilityType.APP_NAME;
+
 public class DriverFactory {
 
     private static WindowsDriver winDriver;
     private static Process winAppDriverProcess;
 
-    public static void logAllWindowTitles() {
-        User32.INSTANCE.EnumWindows((hwnd, data) -> {
-            char[] buffer = new char[1024];
-            User32.INSTANCE.GetWindowTextW(hwnd, buffer, 1024);
-            String title = Native.toString(buffer);
-            if (title != null && !title.trim().isEmpty()) {
-                System.out.println("\uD83E\uDE9F Açık Pencere: " + title + " -> HWND: " + hwnd.getPointer());
-            }
-            return true;
-        }, null);
-    }
+//    public static void logAllWindowTitles() {
+//        User32.INSTANCE.EnumWindows((hwnd, data) -> {
+//            char[] buffer = new char[1024];
+//            User32.INSTANCE.GetWindowTextW(hwnd, buffer, 1024);
+//            String title = Native.toString(buffer);
+//            if (title != null && !title.trim().isEmpty()) {
+//                System.out.println("🧠 Açık Pencere: " + title + " -> HWND: " + hwnd.getPointer());
+//            }
+//            return true;
+//        }, null);
+//    }
 
     private static void startWinAppDriver() {
         try {
             if (winAppDriverProcess == null || !winAppDriverProcess.isAlive()) {
-                String winAppDriverPath = "C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe";
-                String command = "cmd /c start \"\" \"" + winAppDriverPath + "\"";
-                winAppDriverProcess = new ProcessBuilder("cmd.exe", "/c", command).start();
+                String path = "C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe";
+                winAppDriverProcess = new ProcessBuilder("cmd.exe", "/c", "start \"\" \"" + path + "\"").start();
                 System.out.println("🚀 WinAppDriver başlatıldı.");
-                waitUntilWinAppDriverReady(); // Gerekirse burayı da sadeleştirebiliriz
+                waitUntilWinAppDriverReady();
             }
         } catch (IOException e) {
             throw new RuntimeException("❌ WinAppDriver başlatılamadı: " + e.getMessage(), e);
         }
     }
 
-
-
-
     private static void waitUntilWinAppDriverReady() {
         int retries = 10;
         while (retries-- > 0) {
             try (Socket socket = new Socket("127.0.0.1", 4723)) {
-                System.out.println("✅ WinAppDriver hazır ve port dinlemede.");
+                System.out.println("✅ WinAppDriver hazır.");
                 return;
             } catch (IOException e) {
-                System.out.println("⏳ WinAppDriver başlatılıyor, bekleniyor...");
+                System.out.println("⏳ WinAppDriver bekleniyor...");
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1500);
                 } catch (InterruptedException ignored) {
                 }
             }
@@ -63,69 +60,65 @@ public class DriverFactory {
         throw new RuntimeException("❌ WinAppDriver zamanında başlatılamadı!");
     }
 
-
     private static void startERPApplication() {
         try {
             String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";
             new ProcessBuilder("powershell.exe", "-Command", command).start();
-            System.out.println("⏳ ERP uygulaması yönetici olarak açılıyor, 15 saniye bekleniyor...");
-            Thread.sleep(15000);
-            System.out.println("🚀 ERP uygulaması başlatıldı.");
+            System.out.println("⏳ ERP uygulaması başlatılıyor...");
+            Thread.sleep(14000);
+            System.out.println("🚀 ERP uygulaması çalışıyor.");
         } catch (Exception e) {
-            throw new RuntimeException("❌ ERP uygulaması başlatılamadı: " + e.getMessage(), e);
+            throw new RuntimeException("❌ ERP başlatılamadı: " + e.getMessage(), e);
         }
     }
 
     public static WindowsDriver attachToRunningERP() {
         try {
-            System.out.println("⏳ ERP uygulaması için pencere handle aranıyor...");
-            Thread.sleep(5000);
-            logAllWindowTitles();
+            System.out.println("🔎 ERP için pencere handle aranıyor...");
+            Thread.sleep(3000);
+//            logAllWindowTitles();
 
-            String exactTitle = "TIGER 3 ENTERPRISE 2025.LTS1 / v2.99.00.00 (LOGO YAZILIM (MERKEZ))";
-
-            AtomicReference<WinDef.HWND> foundHwnd = new AtomicReference<>();
+            String targetTitle = "TIGER 3 ENTERPRISE 2025.LTS1 / v2.99.00.00 (LOGO YAZILIM (MERKEZ))";
+            AtomicReference<WinDef.HWND> hwndRef = new AtomicReference<>();
 
             User32.INSTANCE.EnumWindows((hwnd, data) -> {
                 char[] buffer = new char[1024];
                 User32.INSTANCE.GetWindowTextW(hwnd, buffer, 1024);
                 String title = Native.toString(buffer);
-                if (title != null && title.trim().equals(exactTitle)) {
-                    System.out.println("\uD83C\uDFAF Doğru top-level uygulama bulundu: " + title);
-                    foundHwnd.set(hwnd);
+                if (title != null && title.trim().equals(targetTitle)) {
+                    System.out.println("🎯 Doğru pencere bulundu: " + title);
+                    hwndRef.set(hwnd);
                     return false;
                 }
                 return true;
             }, null);
 
-            if (foundHwnd.get() == null) {
-                throw new RuntimeException("❌ ERP top-level pencere handle'ı bulunamadı.");
+            if (hwndRef.get() == null) {
+                throw new RuntimeException("❌ ERP top-level pencere bulunamadı.");
             }
 
-            Pointer hwndPointer = foundHwnd.get().getPointer();
+            Pointer hwndPointer = hwndRef.get().getPointer();
             long hwndLong = Pointer.nativeValue(hwndPointer);
             String hexHandle = String.format("0x%X", hwndLong);
-            System.out.println("\uD83D\uDD11 Handle bulundu: " + hwndLong + " | Hex: " + hexHandle);
+            System.out.println("🔑 Handle: " + hexHandle);
 
-            DesiredCapabilities capabilities = new DesiredCapabilities();
-            capabilities.setCapability("appTopLevelWindow", hexHandle);
-            capabilities.setCapability("platformName", "Windows");
-            capabilities.setCapability("deviceName", "WindowsPC");
+            DesiredCapabilities caps = new DesiredCapabilities();
+            caps.setCapability("appTopLevelWindow", hexHandle);
+            caps.setCapability("platformName", "Windows");
+            caps.setCapability("deviceName", "WindowsPC");
 
-            winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), capabilities);
-            System.out.println("✅ ERP uygulamasına başarıyla bağlanıldı.");
-
+            winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), caps);
+            System.out.println("✅ ERP bağlantısı başarılı.");
             return winDriver;
 
         } catch (Exception e) {
-            System.out.println("❌ ERP uygulamasına bağlanılamadı: " + e.getMessage());
-            throw new RuntimeException("❌ ERP uygulamasına bağlanılamadı: " + e.getMessage(), e);
+            throw new RuntimeException("❌ ERP bağlanılamadı: " + e.getMessage(), e);
         }
     }
 
     public static WindowsDriver getWinDriver() {
         if (winDriver == null) {
-           startWinAppDriver();
+            startWinAppDriver();
             startERPApplication();
             return attachToRunningERP();
         }
@@ -142,9 +135,9 @@ public class DriverFactory {
                 new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start();
                 winAppDriverProcess.destroy();
                 winAppDriverProcess = null;
-                System.out.println("\uD83E\uDEA1 WinAppDriver kapatıldı.");
+                System.out.println("🛑 WinAppDriver kapatıldı.");
             } catch (IOException e) {
-                System.out.println("❌ WinAppDriver kapatılırken hata oluştu: " + e.getMessage());
+                System.out.println("❌ WinAppDriver kapatılamadı: " + e.getMessage());
             }
         }
     }

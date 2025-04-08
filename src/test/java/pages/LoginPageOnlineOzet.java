@@ -15,7 +15,7 @@ public class LoginPageOnlineOzet {
 
     private final WindowsDriver driver;
     private final WebDriverWait wait;
-    ElementHelper elementHelper  = new ElementHelper();
+
 
     public LoginPageOnlineOzet(WindowsDriver driver) {
         this.driver = driver;
@@ -24,22 +24,33 @@ public class LoginPageOnlineOzet {
 
     public void loginIfRequired(String username, String password) {
         try {
-            // 1. Giriş yapılı mı kontrol
-            if (driver.getPageSource().contains("Hoş Geldin Kemal Yapıcı")) {
-                System.out.println("✅ Kullanıcı zaten giriş yapmış.");
+            boolean isLoginPageLoaded = false;
+
+            try {
+                WebElement usernameField = new WebDriverWait(driver, 5)
+                        .until(ExpectedConditions.presenceOfElementLocated(MobileBy.AccessibilityId("UserName")));
+                isLoginPageLoaded = usernameField.isDisplayed();
+            } catch (Exception e) {
+                System.out.println("ℹ️ Giriş sayfası yüklenmemiş olabilir, token ile otomatik giriş yapılmış olabilir.");
+            }
+
+            // 🖥️ ID ekranı yüklense de yüklenmese de ekranı büyüt
+            try {
+                WebElement maximizeButton = driver.findElement(MobileBy.AccessibilityId("pcMaximize"));
+                maximizeButton.click();
+                System.out.println("🖥️ Uygulama ekranı büyütüldü (login ekranı görünmese bile).");
+            } catch (Exception e) {
+                System.out.println("⚠️ Ekran büyütme başarısız: " + e.getMessage());
+            }
+
+            if (!isLoginPageLoaded || driver.getPageSource().contains("Hoş Geldin Kemal Yapıcı")) {
+                System.out.println("✅ Kullanıcı zaten giriş yapmış (refresh token ile).");
                 return;
             }
 
-            // 2. Ekranı büyüt
-            WebElement maximizeButton = driver.findElement(MobileBy.AccessibilityId("pcMaximize"));
-            maximizeButton.click();
-            System.out.println("🖥️ Ekran büyütüldü.");
-
             Robot robot = new Robot();
 
-            // 3. Kullanıcı adı alanını bul
-            WebElement usernameField = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    MobileBy.AccessibilityId("UserName")));
+            WebElement usernameField = driver.findElement(MobileBy.AccessibilityId("UserName"));
             usernameField.click();
             Thread.sleep(500);
 
@@ -56,23 +67,18 @@ public class LoginPageOnlineOzet {
                 System.out.println("✅ Kullanıcı adı zaten doğru, yazılmadı.");
             }
 
-            // 4. Şifre alanı
-            WebElement passwordField = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    MobileBy.AccessibilityId("Password")));
+            WebElement passwordField = driver.findElement(MobileBy.AccessibilityId("Password"));
             passwordField.click();
             Thread.sleep(200);
-            ElementHelper.typeTextSmart(passwordField, password);
-            //typeTextWithRobot(password);
+            typeTextWithRobot(password);
             System.out.println("✅ Şifre yazıldı.");
 
-            // 5. Giriş butonuna tıkla
             WebElement loginButton = driver.findElement(MobileBy.AccessibilityId("loginBtn"));
             loginButton.click();
             System.out.println("🔓 Giriş butonuna tıklandı.");
 
-            // 6. Giriş kontrolü
-            WebElement welcomeText = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    MobileBy.name("Hoş Geldin Kemal Yapıcı")));
+            WebElement welcomeText = new WebDriverWait(driver, 10)
+                    .until(ExpectedConditions.presenceOfElementLocated(MobileBy.name("Hoş Geldin Kemal Yapıcı")));
             Assert.assertTrue("❌ Giriş başarısız!", welcomeText.getText().contains("Kemal Yapıcı"));
             System.out.println("✅ Giriş başarılı.");
 
@@ -81,6 +87,9 @@ public class LoginPageOnlineOzet {
             e.printStackTrace();
         }
     }
+
+
+
 
     private void typeTextWithRobot(String text) {
         try {

@@ -2,11 +2,7 @@ package stepDefinitions;
 
 import base.TestContext;
 import io.cucumber.java.en.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
-
 import pages.KuralTanimlamaPage;
 
 public class KuralTanimlamaSteps {
@@ -18,7 +14,6 @@ public class KuralTanimlamaSteps {
         this.context = context;
         this.page = new KuralTanimlamaPage(context.getWindowsDriver());
     }
-
 
     @Given("Kullanıcı ana sayfaya başarıyla giriş yapmış")
     public void kullanici_ana_sayfada() {
@@ -35,8 +30,13 @@ public class KuralTanimlamaSteps {
         page.clickButtonByText(butonText);
     }
 
+    @When("Kullanıcı banka seçiminden {string} değerini seçer")
+    public void kullanici_banka_secimi_yapar(String bankaAdi) {
+        page.selectBank(bankaAdi);
+    }
+
     @Then("{string} sayfasını görmeli")
     public void sayfa_basligi_dogrulama(String expectedText) {
-        Assert.assertTrue(page.isPageTitleDisplayed(expectedText), "Sayfa başlığı doğrulanamadı");
+        Assert.assertTrue(page.isPageTitleDisplayed(expectedText), "❌ Sayfa başlığı doğrulanamadı.");
     }
 }

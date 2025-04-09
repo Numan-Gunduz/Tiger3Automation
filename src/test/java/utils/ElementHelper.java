@@ -6,16 +6,23 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+import java.awt.*;
+import java.awt.event.InputEvent;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.Rectangle;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ElementHelper {
 
@@ -205,7 +212,52 @@ public class ElementHelper {
                 throw new IllegalArgumentException("❌ Desteklenmeyen locator tipi: " + type);
         }
     }
+    public static void clickByRobot(WebElement element) {
+        try {
+            Point point = element.getLocation();
+            Dimension size = element.getSize();
+            int centerX = point.getX() + size.getWidth() / 2;
+            int centerY = point.getY() + size.getHeight() / 2;
 
+            Robot robot = new Robot();
+            Thread.sleep(300);
+            robot.mouseMove(centerX, centerY);
+            Thread.sleep(200);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            Thread.sleep(100);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            Thread.sleep(200);
+            robot.keyPress(java.awt.event.KeyEvent.VK_ENTER);
+            robot.keyRelease(java.awt.event.KeyEvent.VK_ENTER);
 
+            System.out.println("✅ Robot ile tıklama ve ENTER gönderildi: x=" + centerX + ", y=" + centerY);
+        } catch (Exception e) {
+            System.out.println("❌ Robot ile tıklama hatası: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
+    public static void selectDropdownOption(WindowsDriver driver, String visibleText) {
+        try {
+            List<WebElement> options = driver.findElements(By.className("ant-select-item-option"));
+            for (WebElement option : options) {
+                if (option.getText().trim().equalsIgnoreCase(visibleText)) {
+                    option.click();
+                    System.out.println("✅ DOM üzerinden '" + visibleText + "' seçildi.");
+                    return;
+                }
+            }
+
+            // DOM başarısızsa, elementi tekrar bul ve robotla tıkla
+            System.out.println("⚠️ DOM'da '" + visibleText + "' bulunamadı, Robot ile devam ediliyor...");
+            WebElement freshElement = driver.findElement(By.name(visibleText));
+            clickByRobot(freshElement);
+
+        } catch (Exception e) {
+            System.out.println("❌ '" + visibleText + "' seçilemedi.");
+            throw new RuntimeException(e);
+        }
+    }
 }
+
+

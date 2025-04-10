@@ -31,11 +31,11 @@ public class Hooks {
     @Before
     public void setUp(Scenario scenario) {
 
-        extent = ExtentReportManager.createInstance(); // Yeni report dosyası
-        test = extent.createTest(scenario.getName());  // Senaryonun ismiyle test başlat
-        ExtentReportManager.setTest(test);
+//        extent = ExtentReportManager.createInstance(); // Yeni report dosyası
+//        test = extent.createTest(scenario.getName());  // Senaryonun ismiyle test başlat
+//        ExtentReportManager.setTest(test);
 
-        test.info("🚀 Test başlatılıyor: " + scenario.getName());
+      //  test.info("🚀 Test başlatılıyor: " + scenario.getName());
 
 
 

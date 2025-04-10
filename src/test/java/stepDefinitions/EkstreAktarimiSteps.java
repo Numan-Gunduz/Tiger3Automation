@@ -31,20 +31,28 @@ public class EkstreAktarimiSteps {
         page.selectBank(bankaAdi);
     }
 
-    @When("Hesap dropdown'undan {string} hesabını seçer")
-    public void hesap_dropdown_sec(String hesap) {
-        page.selectAccount(hesap);
+    @And("Hesap dropdown'undan {string} hesabını seçer")
+    public void hesap_dropdown_sec(String ibanNo) {
+        page.selectAccount(ibanNo);
     }
+
+//    @When("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
+//    public void butona_tikla_ve_bekle(String buttonName) {
+//        page.clickButtonByText(buttonName);
+//
+//    }
 
     @When("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
-    public void listele_butonuna_tikla_ve_bekle() {
-        page.clickListeleVeBekle(10);
+    public void butona_tikla_ve_bekle(String buttonName) {
+        page.clickListeleVeBekle(15); // max 15 saniyeye kadar beklesin
     }
 
+
     @When("Yüklenen ekstre kayıtlarından {string} durumundaki bir kaydın solundaki seçim kutusunu işaretler")
-    public void eksik_durumda_kayit_sec(String durum) {
-        page.selectRowWithDurum(durum);
+    public void eksik_kaydi_sec(String durum) {
+        page.selectEksikBilgiKaydi(durum);
     }
+
 
     @When("Seçilen kayda sağ tık yapar ve {string} > {string} seçeneğini seçer")
     public void sag_tik_ve_fis_turu_degistir(String menu, String fisTuru) {

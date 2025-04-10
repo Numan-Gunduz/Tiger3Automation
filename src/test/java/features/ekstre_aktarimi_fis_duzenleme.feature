@@ -5,7 +5,7 @@ Feature: Ekstre Aktarımı Senaryosu
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Ziraat Bankası" seçer
     And Hesap dropdown'undan "TR030001000001573636455013" hesabını seçer
-    And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
+    And " Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Yüklenen ekstre kayıtlarından "Eksik Bilgi Bulunuyor" durumundaki bir kaydın solundaki seçim kutusunu işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Havale/EFT Fişi" seçeneğini seçer
     Then Fiş türünün "Havale/EFT Fişi" olarak güncellendiği doğrulanır

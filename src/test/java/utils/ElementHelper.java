@@ -258,6 +258,31 @@ public class ElementHelper {
             throw new RuntimeException(e);
         }
     }
+    public static void clickTextByRobotIfVisible(WindowsDriver driver, String visibleText) {
+        try {
+            WebElement element = driver.findElement(By.xpath("//*[text()='" + visibleText + "']"));
+            clickByRobot(element);
+            System.out.println("✅ Robot ile tıklama başarılı: " + visibleText);
+        } catch (Exception e) {
+            System.out.println("❌ '" + visibleText + "' bulunamadı veya robot ile tıklanamadı: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    public static void clickByCoordinates(int x, int y) {
+        try {
+            Robot robot = new Robot();
+            robot.mouseMove(x, y);
+            Thread.sleep(200);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            System.out.println("🖱️ Koordinata tıklama yapıldı: x=" + x + ", y=" + y);
+        } catch (Exception e) {
+            System.out.println("❌ Koordinata tıklama başarısız: " + e.getMessage());
+        }
+    }
+
+
+
 }
 
 

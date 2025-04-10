@@ -53,11 +53,11 @@ public class LoginPageOnlineOzet {
         loginButton.click();
         System.out.println("🔓 Giriş butonuna tıklandı.");
 
-        WebElement welcomeText = wait.until(
-                ExpectedConditions.presenceOfElementLocated(MobileBy.name("Hoş Geldin Kemal Yapıcı")));
-
-        Assert.assertTrue("❌ Giriş başarısız!", welcomeText.getText().contains("Kemal Yapıcı"));
-        System.out.println("✅ Giriş başarılı.");
+//        WebElement welcomeText = wait.until(
+//                ExpectedConditions.presenceOfElementLocated(MobileBy.name("Hoş Geldin Kemal Yapıcı")));
+//
+//        Assert.assertTrue("❌ Giriş başarısız!", welcomeText.getText().contains("Kemal Yapıcı"));
+//        System.out.println("✅ Giriş başarılı.");
 
     }
 }

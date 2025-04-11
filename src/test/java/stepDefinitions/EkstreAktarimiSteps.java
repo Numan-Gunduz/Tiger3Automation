@@ -48,9 +48,12 @@ public class EkstreAktarimiSteps {
     }
 
 
-    @When("Yüklenen ekstre kayıtlarından {string} durumundaki bir kaydın solundaki seçim kutusunu işaretler")
-    public void eksik_kaydi_sec(String durum) {
-        page.selectEksikBilgiKaydi(durum);
+    @And("Yüklenen ekstre kayıtlarından {string} durumundaki bir kaydın solundaki seçim kutusunu işaretler")
+    public void eksik_kaydi_sec(String durumText) {
+        page.selectFirstCheckbox(); // İlk checkbox'ı seç
+        page.clickScrollRightArrowWithRobot(); // Scroll sağa
+
+        page.selectRowWithDurum(durumText);
     }
 
 

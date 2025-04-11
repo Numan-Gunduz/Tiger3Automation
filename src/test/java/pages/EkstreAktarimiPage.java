@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ElementHelper;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -25,6 +26,12 @@ public class EkstreAktarimiPage {
 
     public void clickSidebarMenu(String menuName) {
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.name(menuName)));
+        System.out.println("Menü alanının yüklenmesi bekleniyor 4 sn");
+        try {
+            Thread.sleep (8000); // tablo yüklemesi için bekle
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         element.click();
     }
     public void selectBank(String bankaAdi) {
@@ -273,43 +280,93 @@ public class EkstreAktarimiPage {
 //        }
 //    }
 
-
-
-    public void selectEksikBilgiKaydi(String durumText) {
+    // 1️⃣ Scroll'u sağa kaydırmak için kullanılır
+    public static void scrollRightWithRobot() {
         try {
             Robot robot = new Robot();
-            for (int i = 0; i < 12; i++) {
-                robot.keyPress(KeyEvent.VK_DOWN);
-                robot.keyRelease(KeyEvent.VK_DOWN);
-                Thread.sleep(200);
-            }
-
-            List<WebElement> durumlar = driver.findElements(By.xpath("//*[contains(@Name, '" + durumText + "')]"));
-            for (WebElement durum : durumlar) {
-                if (durum.isDisplayed()) {
-                    WebElement checkbox = durum.findElement(By.xpath("./preceding-sibling::*[1]"));
-                    checkbox.click();
-                    System.out.println("✅ " + durumText + " satırının kutucuğu seçildi.");
-                    return;
-                }
-            }
-
-            System.out.println("❌ " + durumText + " içeren kayıt bulunamadı.");
+            robot.mouseMove(1700, 1020);  // Scroll bar üzerine odaklan
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseMove(1850, 1020);  // Scroll sağa çek
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            System.out.println("✅ Scroll bar sağa kaydırıldı.");
+            Thread.sleep(1000); // tablo yüklemesi için bekle
         } catch (Exception e) {
-            System.out.println("❌ Scroll + Seçim sırasında hata: " + e.getMessage());
+            System.out.println("❌ Scroll bar kaydırılamadı: " + e.getMessage());
         }
     }
 
+    // 2️⃣ Durumu "Eksik Bilgi Bulunuyor" olan satırı bul ve checkbox'ı işaretle
+    public void selectRowWithDurum(String durumText) {
+        scrollRightWithRobot(); // Scroll yapmadan önce kolon görünmez olabilir
 
-
-    // Yardımcı metot: Aynı satırdaki checkbox'ı bul
-    private WebElement getCheckboxFromRow(WebElement durumHucre) {
         try {
-            WebElement parentRow = durumHucre.findElement(By.xpath("ancestor::tr"));
-            return parentRow.findElement(By.xpath(".//input[@type='checkbox']"));
+            List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                try {
+                    // Satırdaki "Durum" hücresini bul
+                    WebElement durumCell = row.findElement(By.xpath(".//td[normalize-space()='Eksik Bilgi Bulunuyor']"));
+
+
+                    if (durumCell != null && durumCell.getText().trim().equalsIgnoreCase(durumText)) {
+                        // Aynı satırda checkbox'ı bul ve tıkla
+                        WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                        if (!checkbox.isSelected()) {
+                            checkbox.click();
+                            System.out.println("✅ '" + durumText + "' durumundaki satır işaretlendi.");
+                        } else {
+                            System.out.println("ℹ️ Checkbox zaten seçiliydi.");
+                        }
+                        return;
+                    }
+
+                } catch (Exception inner) {
+                    // Satırda "durum" hücresi yoksa hata verme, sıradakine geç
+                }
+            }
+
+            System.out.println("❌ '" + durumText + "' durumuna sahip satır bulunamadı.");
+
         } catch (Exception e) {
-            return null;
+            System.out.println("❌ Satır/checkbox seçiminde genel hata: " + e.getMessage());
         }
+    }
+
+    public void selectFirstCheckbox() {
+        try {
+            // 1️⃣ Checkbox'ı saran label'ı bul
+            WebElement label = driver.findElement(By.xpath("(//label[contains(@class,'ant-checkbox-wrapper')])[1]"));
+
+            // 2️⃣ İçindeki input'u bulup kontrol et
+            WebElement input = label.findElement(By.xpath(".//input[@type='checkbox']"));
+
+            if (!input.isSelected()) {
+                label.click();  // Tıklanabilir olan öğe label’dır
+                System.out.println("✅ İlk satırdaki checkbox işaretlendi.");
+            } else {
+                System.out.println("ℹ️ İlk checkbox zaten seçili.");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ İlk checkbox seçilemedi: " + e.getMessage());
+        }
+    }
+
+    public static void clickScrollRightArrowWithRobot() {
+        try {
+            Robot robot = new Robot();
+            robot.mouseMove(1844, 1011); // Scroll bar sağ ok koordinatı
+            Thread.sleep(300);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            Thread.sleep(400); // kısa basılı tut
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            System.out.println("✅ Scroll sağ oku tıklandı.");
+        } catch (Exception e) {
+            System.out.println("❌ Scroll oku tıklanamadı: " + e.getMessage());
+        }
+    }
+    public void testEkstreCheckboxSecimi() {
+        selectFirstCheckbox(); // İlk checkbox'ı seç
+        clickScrollRightArrowWithRobot(); // Scroll sağa
+        selectRowWithDurum("Eksik Bilgi Bulunuyor"); // Eksik satırı seç
     }
 
 

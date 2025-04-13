@@ -52,21 +52,6 @@ public class EkstreAktarimiPage {
 
 
 
-//    public void selectAccount(String hesapNo) {
-//        try {
-//            WebElement hesapDropdown = driver.findElements(By.className("ant-select-selector")).get(1);
-//            wait.until(ExpectedConditions.elementToBeClickable(hesapDropdown)).click();
-//            Thread.sleep(1000);
-//
-//            // XPath ile öğeyi bul ve Robot ile tıkla
-//            WebElement element = driver.findElement(By.xpath("//*[text()='" + hesapNo + "']"));
-//            ElementHelper.clickByRobot(element);
-//            System.out.println("✅ IBAN başarıyla seçildi: " + hesapNo);
-//        } catch (Exception e) {
-//            System.out.println("⚠️ XPath ile seçim başarısız. Koordinat ile deneniyor...");
-//            ElementHelper.clickByCoordinates(550, 340); // IBAN'ın gerçek koordinatı
-//        }
-//    }
 
     public void selectAccount(String hesapNo) {
         try {
@@ -86,7 +71,6 @@ public class EkstreAktarimiPage {
                 System.out.println("⚠️ ID ile erişim başarısız: " + e.getMessage());
             }
 
-            // 2️⃣ XPath ile title attribute'u kullanarak dene (senin inspect ve DOM görüntüne göre)
             try {
                 WebElement xpathByTitle = driver.findElement(By.xpath("//div[@title='" + hesapNo + "']"));
                 if (xpathByTitle.isDisplayed()) {

@@ -30,12 +30,12 @@ public class Hooks {
     }
     @Before
     public void setUp(Scenario scenario) {
-
+//
 //        extent = ExtentReportManager.createInstance(); // Yeni report dosyası
 //        test = extent.createTest(scenario.getName());  // Senaryonun ismiyle test başlat
 //        ExtentReportManager.setTest(test);
 
-      //  test.info("🚀 Test başlatılıyor: " + scenario.getName());
+        test.info("🚀 Test başlatılıyor: " + scenario.getName());
 
 
 
@@ -60,8 +60,9 @@ public class Hooks {
             throw new RuntimeException(e);
         }
 
+
         // Online Hesap Özeti uygulamasına tıklama
-        ElementHelper.waitForElement(driver, "name", APP_NAME, 8).click();
+        ElementHelper.waitForElement(driver, "name", APP_NAME, 13).click();
         System.out.println("✅ '" + APP_NAME + "' tıklandı.");
 
         // Sadece pencere geldi mi kontrolü, içerik değil
@@ -78,10 +79,7 @@ public class Hooks {
 
     }
 
-//    @After
-//    public void tearDown() {
-//        DriverFactory.quitDriver();
-//    }
+
 @After
 public void tearDown(Scenario scenario) {
     if (scenario.isFailed()) {

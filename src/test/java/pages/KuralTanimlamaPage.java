@@ -7,9 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ElementHelper;
 
-import java.util.List;
-import java.awt.*;
-import java.awt.event.InputEvent;
+
 
 public class KuralTanimlamaPage {
 

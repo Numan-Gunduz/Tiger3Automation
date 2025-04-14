@@ -87,3 +87,4 @@ public class EkstreAktarimiSteps {
         Assert.assertTrue(page.isDurumColumnShows(expected));
     }
 }
+

@@ -24,6 +24,21 @@ public class EkstreAktarimiPage {
         this.wait = new WebDriverWait(driver, 15);
     }
 
+    /*
+    * public class EkstrePage {
+    WebDriver driver;
+
+    public EkstrePage(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public void selectDropdown(String bankName) {
+        WebElement dropdown = driver.findElement(By.xpath("//div[@title='" + bankName + "']"));
+        dropdown.click();
+    }
+}
+*/
+
     public void clickSidebarMenu(String menuName) {
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.name(menuName)));
         System.out.println("Menü alanının yüklenmesi bekleniyor 4 sn");

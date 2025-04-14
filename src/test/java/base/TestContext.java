@@ -3,22 +3,21 @@ package base;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
-/**
- * Tüm test boyunca WebDriver, WindowsDriver ve diğer global objelere erişimi sağlayan temel context yapısı.
- * Clean Code prensiplerine uygun, açık ve sade.
- */
+
 public class TestContext {
 
     private WindowsDriver<WebElement> windowsDriver;
     private WebDriver webDriver;
 
-    // Constructor: İstenirse driver'lar başlatılır.
+
     public TestContext() {
-        // Varsayılan boş bırakıldı. İsteğe göre customize edilebilir.
+
     }
 
-    // ✅ Getter ve Setter - WindowsDriver (GENERIC)
+    //  Getter ve Setter - WindowsDriver (GENERIC)
     public WindowsDriver<WebElement> getWindowsDriver() {
         return windowsDriver;
     }
@@ -27,7 +26,7 @@ public class TestContext {
         this.windowsDriver = windowsDriver;
     }
 
-    // ✅ Getter ve Setter - WebDriver (Selenium için)
+    //  Getter ve Setter - WebDriver (Selenium için)
     public WebDriver getWebDriver() {
         return webDriver;
     }
@@ -36,9 +35,10 @@ public class TestContext {
         this.webDriver = webDriver;
     }
 
-    // ✅ Yardımcı: Aktif olan driver’ı döndür
+    //  Yardımcı: Aktif olan driver’ı döndür
     public Object getActiveDriver() {
         if (webDriver != null) return webDriver;
         return windowsDriver;
     }
 }
+

@@ -4,6 +4,9 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef;
 import io.appium.java_client.windows.WindowsDriver;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.IOException;
@@ -17,6 +20,18 @@ public class DriverFactory {
 
     private static WindowsDriver winDriver;
     private static Process winAppDriverProcess;
+
+        private static WebDriver seleniumDriver;
+// eğer port açılırsa bu şekilde kullanmayı planlıyorum
+        public static WebDriver getSeleniumDriver() {
+            if (seleniumDriver == null) {
+                ChromeOptions options = new ChromeOptions();
+                options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222");
+                seleniumDriver = new ChromeDriver(options);
+            }
+            return seleniumDriver;
+        }
+
 
 //    public static void logAllWindowTitles() {
 //        User32.INSTANCE.EnumWindows((hwnd, data) -> {

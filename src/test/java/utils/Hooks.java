@@ -30,6 +30,23 @@ public class Hooks {
     }
     @Before
     public void setUp(Scenario scenario) {
+
+
+        WindowsDriver driver = DriverFactory.getWinDriver();
+        context.setWindowsDriver(driver);
+
+        //win tarafı ile işimiz bittikten sonra :
+//// WebView ekran açıldıktan sonra:
+//        System.out.println(" WebView ekranı açıldı. Selenium ile bağlantı başlatılıyor...");
+//
+//// Selenium Driver'ı başlat
+//        WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
+//        context.setWebDriver(seleniumDriver);
+//
+//        System.out.println(" Selenium WebDriver aktifleştirildi, testler DOM üzerinden devam edecek.");
+
+
+        WebDriverWait wait = new WebDriverWait(driver, 15);
 //
 //        extent = ExtentReportManager.createInstance(); // Yeni report dosyası
 //        test = extent.createTest(scenario.getName());  // Senaryonun ismiyle test başlat
@@ -37,13 +54,6 @@ public class Hooks {
 
         test.info("🚀 Test başlatılıyor: " + scenario.getName());
 
-
-
-        WindowsDriver driver = DriverFactory.getWinDriver();
-        context.setWindowsDriver(driver); // 🔥 burada driver’ı context'e set ediyoruz
-
-
-        WebDriverWait wait = new WebDriverWait(driver, 15);
 
         System.out.println("📋 Giriş ekranı kontrol ediliyor...");
         ElementHelper.clearAndFillFieldIfExists(driver, "EdtCode", DEFAULT_USERNAME);

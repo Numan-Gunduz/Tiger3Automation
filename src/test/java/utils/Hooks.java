@@ -46,6 +46,7 @@ public class Hooks {
 //        System.out.println(" Selenium WebDriver aktifleştirildi, testler DOM üzerinden devam edecek.");
 
 
+
         WebDriverWait wait = new WebDriverWait(driver, 15);
 //
 //        extent = ExtentReportManager.createInstance(); // Yeni report dosyası
@@ -102,3 +103,85 @@ public void tearDown(Scenario scenario) {
     DriverFactory.quitDriver();
 }
 }
+
+
+/*
+
+// ✅ Güncellenmiş Hooks.java - WinAppDriver'dan Selenium'a Geçiş
+package utils;
+
+import base.TestContext;
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.windows.WindowsDriver;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.LoginPageOnlineOzet;
+
+public class Hooks {
+    private static ExtentReports extent;
+    private static ExtentTest test;
+    private static final String DEFAULT_USERNAME = "LOGO";
+    private static final String DEFAULT_PASSWORD = "LOGO";
+    private static final String DEFAULT_COMPANY = "1";
+    private static final String APP_NAME = "Online Hesap Özeti Uygulaması";
+
+    private final TestContext context;
+
+    public Hooks(TestContext context) {
+        this.context = context;
+    }
+
+    @Before
+    public void setUp(Scenario scenario) {
+        test.info("🚀 Test başlatılıyor: " + scenario.getName());
+
+        // 1️⃣ WinAppDriver ile ERP login işlemi
+        WindowsDriver driver = DriverFactory.getWinDriver();
+        context.setWindowsDriver(driver);
+
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+        System.out.println("📋 Giriş ekranı kontrol ediliyor...");
+        ElementHelper.clearAndFillFieldIfExists(driver, "EdtCode", DEFAULT_USERNAME);
+        ElementHelper.clearAndFillField(driver, "EdtCyp", DEFAULT_PASSWORD);
+        ElementHelper.clearAndFillField(driver, "EdtNum", DEFAULT_COMPANY);
+
+        try {
+            WebElement girisYap = wait.until(ExpectedConditions.elementToBeClickable(
+                    MobileBy.name("Giriş Yap")));
+            girisYap.click();
+            System.out.println("✅ ERP giriş başarılı.");
+        } catch (Exception e) {
+            throw new RuntimeException("❌ ERP girişi sırasında hata oluştu: " + e.getMessage(), e);
+        }
+
+        // 2️⃣ Online Hesap Özeti Uygulamasına geçiş
+        ElementHelper.waitForElement(driver, "name", APP_NAME, 13).click();
+        ElementHelper.waitForWindowByTitle(APP_NAME, 5);
+        ElementHelper.switchToWindowByTitle(APP_NAME);
+
+        // 3️⃣ WebView (Selenium) Driver başlatılıyor
+        System.out.println("🌐 WebView algılandı. ChromeDriver başlatılıyor...");
+        WebDriver seleniumDriver = DriverFactory.getOrStartSeleniumDriver();
+        context.setWebDriver(seleniumDriver);
+        System.out.println("✅ Selenium WebDriver aktifleştirildi, DOM testleri başlayabilir.");
+    }
+
+    @After
+    public void tearDown(Scenario scenario) {
+        if (scenario.isFailed()) {
+            test.fail("❌ Test başarısız oldu: " + scenario.getName());
+        } else {
+            test.pass("✅ Test başarıyla tamamlandı.");
+        }
+        extent.flush();
+        DriverFactory.quitDriver();
+    }
+}
+*/

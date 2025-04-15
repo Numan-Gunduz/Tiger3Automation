@@ -13,7 +13,16 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
-
+/*
+* public static WebDriver getOrStartSeleniumDriver() {
+    if (seleniumDriver == null) {
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222");
+        seleniumDriver = new ChromeDriver(options);
+    }
+    return seleniumDriver;
+}
+*/
 import static io.appium.java_client.remote.IOSMobileCapabilityType.APP_NAME;
 
 public class DriverFactory {

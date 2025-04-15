@@ -13,7 +13,16 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+/*
 
+public class EkstreAktarimiPage {
+    private final WebDriver driver; // WindowsDriver değil, WebDriver
+    public EkstreAktarimiPage(WebDriver driver) {
+        this.driver = driver;
+    }
+}
+
+* */
 public class EkstreAktarimiPage {
 
     private final WindowsDriver<WebElement> driver;

@@ -69,10 +69,9 @@ public class EkstreAktarimiPage {
             System.out.println("✅ '" + bankaAdi + "' başarıyla seçildi (Robot ile XPath).");
         } catch (Exception e) {
             System.out.println("⚠️ XPath ile de bulunamadı. Koordinat ile deneniyor...");
-            ElementHelper.clickByCoordinates(267, 400); // Inspect çıktısından alınan gerçek nokta
+            ElementHelper.clickByCoordinates(267, 380); // Inspect çıktısından alınan gerçek nokta
         }
     }
-
 
 
 
@@ -135,101 +134,12 @@ public class EkstreAktarimiPage {
         }
 
         // 5️⃣ Hiçbiri olmadıysa son çare: koordinat
-        ElementHelper.clickByCoordinates(550, 340);
+        ElementHelper.clickByCoordinates(550, 310);
         System.out.println("✅ Koordinat ile IBAN seçimi yapıldı.");
     }
 
 
-//    public void selectAccountByHelpText(String iban) {
-//        try {
-//            // 1. Dropdown'u aç
-//            WebElement hesapDropdown = driver.findElements(By.className("ant-select-selector")).get(1);
-//            wait.until(ExpectedConditions.elementToBeClickable(hesapDropdown)).click();
-//            System.out.println("✅ Hesap dropdown tıklandı.");
-//            Thread.sleep(1000);
-//
-//            // 2. IBAN öğesini HelpText ya da Name ile bul
-//            WebElement ibanElement = wait.until(ExpectedConditions.presenceOfElementLocated(
-//                    By.xpath("//*[(contains(@HelpText, '" + iban + "')) or (@Name='" + iban + "')]")
-//            ));
-//
-//            // 3. IBAN öğesi görünürse odaklan ve ENTER simüle et
-//            if (ibanElement.isDisplayed()) {
-//                // Öğeye tıkla (odaklama için)
-//                ibanElement.click();
-//                Thread.sleep(500);
-//
-//                // Robot ile ENTER gönder
-//                Robot robot = new Robot();
-//                robot.keyPress(KeyEvent.VK_ENTER);
-//                robot.keyRelease(KeyEvent.VK_ENTER);
-//
-//                System.out.println("✅ IBAN seçildi: " + iban);
-//            } else {
-//                System.out.println("⚠️ IBAN görünür değil.");
-//            }
-//
-//        } catch (Exception e) {
-//            System.out.println("❌ IBAN seçimi hatası: " + e.getMessage());
-//        }
-//    }
 
-
-//    public void selectAccount(String hesapNo) {
-//        try {
-//            WebElement hesapDropdown = driver.findElements(By.className("ant-select-selector")).get(1);
-//            wait.until(ExpectedConditions.elementToBeClickable(hesapDropdown)).click();
-//            Thread.sleep(1000);
-//            List<WebElement> options = driver.findElements(By.className("ant-select-item-option-content"));
-//            for (WebElement opt : options) {
-//                System.out.println("Dropdown seçeneği: " + opt.getText());
-//            }
-//
-//            WebElement element = null;
-//
-//            // 1 - title attribute ile
-//            try {
-//                element = driver.findElement(By.xpath("//div[@title='" + hesapNo + "']"));
-//                System.out.println("✅ XPath title ile bulundu.");
-//            } catch (Exception e) {
-//                System.out.println("⚠️ XPath title ile bulunamadı.");
-//            }
-//
-//            // 2 - içerik (text) ile option-content div
-//            if (element == null) {
-//                try {
-//                    element = driver.findElement(By.xpath("//div[contains(@class,'ant-select-item-option-content') and normalize-space(text())='" + hesapNo + "']"));
-//                    System.out.println("✅ XPath içerik ile bulundu.");
-//                } catch (Exception e) {
-//                    System.out.println("⚠️ XPath içerik ile bulunamadı.");
-//                }
-//            }
-//
-//            // 3 - option container div ve title attribute ile
-//            if (element == null) {
-//                try {
-//                    element = driver.findElement(By.xpath("//div[contains(@class,'ant-select-item-option') and @title='" + hesapNo + "']"));
-//                    System.out.println("✅ XPath class + title ile bulundu.");
-//                } catch (Exception e) {
-//                    System.out.println("⚠️ XPath class + title ile bulunamadı.");
-//                }
-//            }
-//
-//            // 4 - Erişilebiliyorsa tıkla
-//            if (element != null && element.isDisplayed()) {
-//                ElementHelper.clickByRobot(element);
-//                System.out.println("✅ Robot ile IBAN seçimi başarılı.");
-//                return;
-//            }
-//
-//        } catch (Exception e) {
-//            System.out.println("❌ Dropdown işleminde genel hata: " + e.getMessage());
-//        }
-//
-//        // 5 - Koordinat fallback
-//        ElementHelper.clickByCoordinates(550, 340);
-//        System.out.println("✅ Koordinat ile IBAN seçimi yapıldı.");
-//    }
 
 
     public void clickListeleVeBekle(int maxWaitSeconds) {

@@ -53,7 +53,7 @@ public class Hooks {
 //        test = extent.createTest(scenario.getName());  // Senaryonun ismiyle test başlat
 //        ExtentReportManager.setTest(test);
 
-        test.info("🚀 Test başlatılıyor: " + scenario.getName());
+      //  test.info("🚀 Test başlatılıyor: " + scenario.getName());
 
 
         System.out.println("📋 Giriş ekranı kontrol ediliyor...");

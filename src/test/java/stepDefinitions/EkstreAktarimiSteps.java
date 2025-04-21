@@ -6,6 +6,8 @@ import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import pages.EkstreAktarimiPage;
 
+import static org.junit.Assert.assertTrue;
+
 public class EkstreAktarimiSteps {
 
     TestContext context;
@@ -56,10 +58,11 @@ public class EkstreAktarimiSteps {
         assert page.isFisTuruUpdated(text);
     }
 
-    @And("ERP Cari Hesap Kodu alanı boş ise, Durum sütununda {string} yazdığı görülür")
-    public void durumKontrol(String durum) {
-        assert page.isDurumColumnShows(durum);
+    @And("ERP Cari Hesap Kodu boş olan satırda, Durum alanı {string} olmalıdır")
+    public void validateDurumByExpectedValue(String expectedDurumText) {
+        assert page.validateDurumForEmptyCariHesap(expectedDurumText);
     }
+
 
     @When("ERP Cari Hesap Kodu alanındaki üç noktaya tıklar")
     public void ucNoktayaTiklar() {

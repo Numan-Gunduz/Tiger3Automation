@@ -98,13 +98,11 @@ public class EkstreAktarimiPage {
         List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
         for (WebElement row : rows) {
             try {
-                // Tüm hücreleri al
                 List<WebElement> cells = row.findElements(By.tagName("td"));
 
                 for (WebElement cell : cells) {
                     String cellText = cell.getText().trim();
-                    if (cellText.contains(durumText)) {
-                        // Satırdaki checkbox input'u bul ve tıkla
+                    if (cellText.equals(durumText)) { // contains DEĞİL!
                         WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
                         if (!checkbox.isSelected()) {
                             checkbox.click();
@@ -118,9 +116,9 @@ public class EkstreAktarimiPage {
             }
         }
 
-        // Hiçbir satırda bulunamazsa
-        throw new RuntimeException("❌ '" + durumText + "' içeren satır bulunamadı!");
+        throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
     }
+
 
 
 
@@ -164,18 +162,38 @@ public class EkstreAktarimiPage {
             return false;
         }
     }
+    public boolean  validateDurumForEmptyCariHesap(String expectedDurumText) {
+        try {
+            List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                String cariHesap = row.findElement(By.xpath("./td[normalize-space()='']")).getText().trim();
+                String durum = row.findElement(By.xpath("./td[6]")).getText().trim(); // Alternatif: td[contains(.,'Eksik Bilgi')]
+                if (cariHesap.isEmpty()) {
+                    if (!durum.equals(expectedDurumText)) {
+                        System.out.println("❌ Hatalı Durum: Beklenen '" + expectedDurumText + "' ama bulundu: '" + durum + "'");
+                        return false;
+                    } else {
+                        System.out.println("✅ Doğru: ERP Cari Hesap Kodu boş ve Durum '" + expectedDurumText + "'");
+                    }
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("❌ Hata oluştu: " + e.getMessage());
+            return false;
+        }
+    }
+
 
     public boolean isDurumColumnShows(String expectedDurum) {
         try {
             List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
 
             for (WebElement row : rows) {
-                // Eğer bu satırda checkbox işaretlenmişse (input checked ise)
                 WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
                 boolean isChecked = checkbox.isSelected();
 
                 if (isChecked) {
-                    // Satırın hücrelerini al
                     List<WebElement> cells = row.findElements(By.tagName("td"));
 
                     for (WebElement cell : cells) {
@@ -186,7 +204,6 @@ public class EkstreAktarimiPage {
                         }
                     }
 
-                    // Eğer checkbox işaretli ama durum yoksa:
                     System.out.println("❌ Seçilen satırda '" + expectedDurum + "' bulunamadı.");
                     return false;
                 }
@@ -199,6 +216,7 @@ public class EkstreAktarimiPage {
             return false;
         }
     }
+
 
 
     public void clickErpCariKodDots() {

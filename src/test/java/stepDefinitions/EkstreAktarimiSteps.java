@@ -22,69 +22,58 @@ public class EkstreAktarimiSteps {
     }
 
     @When("Sol menüdeki {string} seçeneğine tıklar")
-    public void sol_menu_secenek_tiklar(String menu) {
+    public void sol_menu_sec(String menu) {
         page.clickSidebarMenu(menu);
     }
 
-    @When("Banka dropdown'undan {string} seçer")
-    public void banka_dropdown_sec(String bankaAdi) {
-        page.selectBank(bankaAdi);
+    @And("Banka dropdown'undan {string} seçer")
+    public void banka_dropdown_sec(String banka) {
+        page.selectBank(banka);
     }
 
     @And("Hesap dropdown'undan {string} hesabını seçer")
-    public void hesap_dropdown_sec(String ibanNo) {
-        page.selectAccount(ibanNo);
+    public void hesap_dropdown_sec(String iban) {
+        page.selectAccount(iban);
     }
 
-//    @When("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
-//    public void butona_tikla_ve_bekle(String buttonName) {
-//        page.clickButtonByText(buttonName);
-//
-//    }
-
-    @When("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
-    public void butona_tikla_ve_bekle(String buttonName) {
-        page.clickListeleVeBekle(15); // max 15 saniyeye kadar beklesin
+    @And("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
+    public void butona_tikla(String btnText) {
+        page.clickListele(); // özel method yaptık zaten
     }
-
 
     @And("Yüklenen ekstre kayıtlarından {string} durumundaki bir kaydın solundaki seçim kutusunu işaretler")
-    public void eksik_kaydi_sec(String durumText) {
-        page.selectFirstCheckbox(); // İlk checkbox'ı seç
-        page.clickScrollRightArrowWithRobot(); // Scroll sağa
-
-        page.selectRowWithDurum(durumText);
+    public void ekstre_kaydi_sec(String durum) {
+        page.selectRowWithDurum(durum);
     }
 
-
-    @When("Seçilen kayda sağ tık yapar ve {string} > {string} seçeneğini seçer")
-    public void sag_tik_ve_fis_turu_degistir(String menu, String fisTuru) {
+    @And("Seçilen kayda sağ tık yapar ve {string} > {string} seçeneğini seçer")
+    public void sagTiklaVeFisTuruDegistir(String menu, String fisTuru) {
         page.changeFisTypeTo(menu, fisTuru);
     }
 
     @Then("Fiş türünün {string} olarak güncellendiği doğrulanır")
-    public void fis_turu_dogrula(String beklenen) {
-        Assert.assertTrue(page.isFisTuruUpdated(beklenen));
+    public void fisTuruDogrulama(String text) {
+        assert page.isFisTuruUpdated(text);
     }
 
-    @Then("ERP Cari Hesap Kodu alanı boş ise, Durum sütununda {string} yazdığı görülür")
-    public void eksik_bilgi_durumu_dogrula(String beklenenDurum) {
-        Assert.assertTrue(page.isDurumColumnShows(beklenenDurum));
+    @And("ERP Cari Hesap Kodu alanı boş ise, Durum sütununda {string} yazdığı görülür")
+    public void durumKontrol(String durum) {
+        assert page.isDurumColumnShows(durum);
     }
 
     @When("ERP Cari Hesap Kodu alanındaki üç noktaya tıklar")
-    public void erp_cari_kod_uc_noktaya_tiklar() {
+    public void ucNoktayaTiklar() {
         page.clickErpCariKodDots();
     }
 
-    @When("Açılan pencerede ilk satırdaki cari hesap değerine çift tıklar")
-    public void ilk_cari_degerine_cift_tiklar() {
+    @And("Açılan pencerede ilk satırdaki cari hesap değerine çift tıklar")
+    public void cariSec() {
         page.selectFirstCariFromPopup();
     }
 
     @Then("ERP Cari Hesap Kodu alanı dolduğunda, Durum sütunu {string} olarak güncellenir")
-    public void durum_guncellenir_kaydedilebilir(String expected) {
-        Assert.assertTrue(page.isDurumColumnShows(expected));
+    public void durumKaydedilebilir(String durum) {
+        assert page.isDurumColumnShows(durum);
     }
 }
 

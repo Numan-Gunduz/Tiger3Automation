@@ -36,6 +36,8 @@ public class Hooks {
     public void setUp(Scenario scenario) {
         System.out.println("🚀 Test başlatılıyor: " + scenario.getName());
 
+        System.out.println("Appium server başlatılıyor");
+        DriverFactory.startAppiumServer();
         // ERP uygulamasını başlat
         DriverFactory.startERPApplication();
 

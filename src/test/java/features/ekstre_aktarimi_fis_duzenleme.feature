@@ -9,7 +9,7 @@ Feature: Ekstre Aktarımı Senaryosu
     And Yüklenen ekstre kayıtlarından "Eksik Bilgi Bulunuyor" durumundaki bir kaydın solundaki seçim kutusunu işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Havale/EFT Fişi" seçeneğini seçer
     Then Fiş türünün "Havale/EFT Fişi" olarak güncellendiği doğrulanır
-    And ERP Cari Hesap Kodu alanı boş ise, Durum sütununda "Eksik Bilgi Bulunuyor" yazdığı görülür
+    And ERP Cari Hesap Kodu alanı boş ise, Durum sütununda "Eksik Bilgi Bulunuyorr" yazdığı görülür
     When ERP Cari Hesap Kodu alanındaki üç noktaya tıklar
     And Açılan pencerede ilk satırdaki cari hesap değerine çift tıklar
     Then ERP Cari Hesap Kodu alanı dolduğunda, Durum sütunu "Kaydedilebilir" olarak güncellenir

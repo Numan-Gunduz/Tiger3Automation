@@ -111,14 +111,12 @@ public class ElementHelper {
         try {
             for (int i = 0; i < timeoutInSeconds * 2; i++) {
                 try {
-                    WebElement element = driver.findElementByAccessibilityId(accessibilityId);
+                    WebElement element = driver.findElement(MobileBy.AccessibilityId(accessibilityId));
                     if (element.isDisplayed()) return true;
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) { }
                 Thread.sleep(500);
             }
-        } catch (InterruptedException ignored) {
-        }
+        } catch (InterruptedException ignored) { }
         return false;
     }
 
@@ -152,7 +150,7 @@ public class ElementHelper {
     }
 
     public static WebElement waitForElement(WindowsDriver driver, String type, String locator, int timeout) {
-        WebDriverWait wait = new WebDriverWait(driver, timeout);
+        WebDriverWait wait = new WebDriverWait(driver,  Duration.ofSeconds(timeout));
         switch (type) {
             case "accessibilityId":
                 return wait.until(ExpectedConditions.presenceOfElementLocated(MobileBy.AccessibilityId(locator)));
@@ -191,13 +189,13 @@ public class ElementHelper {
     }
     public static WebElement waitUntilClickable(WindowsDriver driver, String by, String value, int timeoutSeconds) {
         By locator = getBy(by, value);
-        return new WebDriverWait(driver, timeoutSeconds)
+        return new WebDriverWait(driver,  Duration.ofSeconds(timeoutSeconds))
                 .until(ExpectedConditions.elementToBeClickable(locator));
     }
 
     public static WebElement waitUntilVisible(WindowsDriver driver, String by, String value, int timeoutSeconds) {
         By locator = getBy(by, value);
-        return new WebDriverWait(driver, timeoutSeconds)
+        return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
                 .until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 

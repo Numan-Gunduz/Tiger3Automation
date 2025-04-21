@@ -13,7 +13,7 @@ public class EkstreAktarimiSteps {
 
     public EkstreAktarimiSteps(TestContext context) {
         this.context = context;
-        this.page = new EkstreAktarimiPage(context.getWindowsDriver());
+        this.page = new EkstreAktarimiPage(context.getWebDriver());
     }
 
     @Given("Kullanıcı sisteme başarılı şekilde giriş yapmış ve ana sayfa tamamen yüklenmiştir")

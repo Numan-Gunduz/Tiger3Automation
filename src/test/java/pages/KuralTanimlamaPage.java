@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ElementHelper;
 
+import java.time.Duration;
 
 
 public class KuralTanimlamaPage {
@@ -23,7 +24,7 @@ public class KuralTanimlamaPage {
     }
 
     public void clickButtonByText(String buttonText) {
-        WebDriverWait wait = new WebDriverWait(driver, 15);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//*[contains(@Name, '" + buttonText + "')]")
         ));
@@ -31,7 +32,7 @@ public class KuralTanimlamaPage {
     }
 
     public boolean isPageTitleDisplayed(String expectedText) {
-        WebDriverWait wait = new WebDriverWait(driver, 15);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(
                     By.xpath("//*[contains(@Name, '" + expectedText + "')]")
@@ -45,7 +46,7 @@ public class KuralTanimlamaPage {
 
 
     public void clickDropdownByClassName(String className) {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
                 By.className(className)));
         dropdown.click();

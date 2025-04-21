@@ -16,7 +16,7 @@ public class LoginPageOnlineOzet {
 
     public LoginPageOnlineOzet(WindowsDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 30);
+        this.wait = new WebDriverWait(driver,  Duration.ofSeconds(15));
     }
 
     public void loginIfRequired(String username, String password) {

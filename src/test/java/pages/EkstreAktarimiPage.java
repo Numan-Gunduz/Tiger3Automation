@@ -1,9 +1,6 @@
 package pages;
 
-import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -11,300 +8,142 @@ import utils.ElementHelper;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.time.Duration;
 import java.util.List;
-/*
 
 public class EkstreAktarimiPage {
-    private final WebDriver driver; // WindowsDriver değil, WebDriver
+
+    private final WebDriver driver;
+    private final WebDriverWait wait;
+
     public EkstreAktarimiPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));;
     }
-}
-
-* */
-public class EkstreAktarimiPage {
-
-    private final WindowsDriver<WebElement> driver;
-
-    private final WebDriverWait wait;
-    public EkstreAktarimiPage(WindowsDriver<WebElement> driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, 15);
-    }
-
-    /*
-    * public class EkstrePage {
-    WebDriver driver;
-
-    public EkstrePage(WebDriver driver) {
-        this.driver = driver;
-    }
-
-    public void selectDropdown(String bankName) {
-        WebElement dropdown = driver.findElement(By.xpath("//div[@title='" + bankName + "']"));
-        dropdown.click();
-    }
-}
-*/
 
     public void clickSidebarMenu(String menuName) {
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.name(menuName)));
-        System.out.println("Menü alanının yüklenmesi bekleniyor 4 sn");
-        try {
-            Thread.sleep (8000); // tablo yüklemesi için bekle
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//span[contains(@class, 'ant-menu-title-content') and text()='Ekstre Aktarımı']")));
         element.click();
-    }
-    public void selectBank(String bankaAdi) {
-        WebElement bankaDropdown = wait.until(ExpectedConditions.elementToBeClickable(By.className("ant-select-selector")));
-        bankaDropdown.click();
 
+    }
+
+    public void selectBank(String bankaAdi) {
         try {
-            Thread.sleep(1000);
-            WebElement element = driver.findElement(By.xpath("//*[contains(@title, '" + bankaAdi + "')]"));
-            ElementHelper.clickByRobot(element);
-            System.out.println("✅ '" + bankaAdi + "' başarıyla seçildi (Robot ile XPath).");
+            // "Banka" başlığına göre ilgili dropdown'ı bul ve tıkla
+            WebElement bankaDropdown = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[text()='Banka']/ancestor::div[contains(@id,'select_container')]//div[contains(@class,'ant-select-selector')]")
+            ));
+            bankaDropdown.click();
+
+            // Dropdown görünür hale gelene kadar bekle
+            wait.until(driver -> {
+                List<WebElement> dropdowns = driver.findElements(By.className("ant-select-dropdown"));
+                return dropdowns.stream().anyMatch(e -> !e.getAttribute("class").contains("hidden"));
+            });
+
+            // İlgili banka seçeneğini bul ve tıkla
+            WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[@class='ant-select-item-option-content' and text()='" + bankaAdi + "']")
+            ));
+            option.click();
+
+            System.out.println("✅ Banka seçildi: " + bankaAdi);
         } catch (Exception e) {
-            System.out.println("⚠️ XPath ile de bulunamadı. Koordinat ile deneniyor...");
-            ElementHelper.clickByCoordinates(267, 380); // Inspect çıktısından alınan gerçek nokta
+            System.out.println("❌ Banka seçimi hatası: " + e.getMessage());
+            throw e;
         }
     }
-
-
-
 
     public void selectAccount(String hesapNo) {
         try {
-            WebElement hesapDropdown = driver.findElements(By.className("ant-select-selector")).get(1);
-            wait.until(ExpectedConditions.elementToBeClickable(hesapDropdown)).click();
-            Thread.sleep(1000);
+            WebElement hesapDropdown = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[text()='Hesap']/ancestor::div[contains(@id,'select_container')]//div[contains(@class,'ant-select-selector')]")
+            ));
+            hesapDropdown.click();
 
-            // 1️⃣ ID üzerinden erişmeyi dene (ama bu element gerçek IBAN değil, list item değilse iş yapmaz)
-            try {
-                WebElement elementById = driver.findElement(By.id("rc_select_4_list_2")); // inspect'e göre id
-                if (elementById.isDisplayed() && elementById.getText().contains(hesapNo)) {
-                    ElementHelper.clickByRobot(elementById);
-                    System.out.println("✅ ID ile seçim yapıldı.");
-                    return;
-                }
-            } catch (Exception e) {
-                System.out.println("⚠️ ID ile erişim başarısız: " + e.getMessage());
-            }
+            wait.until(driver -> {
+                List<WebElement> dropdowns = driver.findElements(By.className("ant-select-dropdown"));
+                return dropdowns.stream().anyMatch(e -> !e.getAttribute("class").contains("hidden"));
+            });
 
-            try {
-                WebElement xpathByTitle = driver.findElement(By.xpath("//div[@title='" + hesapNo + "']"));
-                if (xpathByTitle.isDisplayed()) {
-                    ElementHelper.clickByRobot(xpathByTitle);
-                    System.out.println("✅ XPath title ile seçim başarılı.");
-                    return;
-                }
-            } catch (Exception e) {
-                System.out.println("⚠️ XPath (title) ile erişilemedi: " + e.getMessage());
-            }
+            WebElement hesapOption = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[@class='ant-select-item-option-content' and text()='" + hesapNo + "']")
+            ));
+            hesapOption.click();
 
-            // 3️⃣ XPath text içerikli normal div içeriği ile (text() fonksiyonu)
-            try {
-                WebElement xpathByText = driver.findElement(By.xpath("//div[contains(text(),'" + hesapNo + "')]"));
-                if (xpathByText.isDisplayed()) {
-                    ElementHelper.clickByRobot(xpathByText);
-                    System.out.println("✅ XPath text ile seçim başarılı.");
-                    return;
-                }
-            } catch (Exception e) {
-                System.out.println("⚠️ XPath text ile erişilemedi: " + e.getMessage());
-            }
-
-            // 4️⃣ className + title kombinasyonu (daha spesifik)
-            try {
-                WebElement byClassAndTitle = driver.findElement(By.xpath("//div[contains(@class, 'ant-select-item-option') and @title='" + hesapNo + "']"));
-                if (byClassAndTitle.isDisplayed()) {
-                    ElementHelper.clickByRobot(byClassAndTitle);
-                    System.out.println("✅ XPath class + title ile seçim başarılı.");
-                    return;
-                }
-            } catch (Exception e) {
-                System.out.println("⚠️ XPath class + title erişilemedi: " + e.getMessage());
-            }
-
+            System.out.println("✅ Hesap seçildi: " + hesapNo);
         } catch (Exception e) {
-            System.out.println("❌ Dropdown işleminde hata: " + e.getMessage());
+            System.out.println("❌ IBAN seçimi başarısız: " + e.getMessage());
+            throw e;
         }
-
-        // 5️⃣ Hiçbiri olmadıysa son çare: koordinat
-        ElementHelper.clickByCoordinates(550, 310);
-        System.out.println("✅ Koordinat ile IBAN seçimi yapıldı.");
     }
 
 
-
-
-
     public void clickListeleVeBekle(int maxWaitSeconds) {
-        clickButtonByText("Listele"); // XPath veya koordinatla tıklar
-
+        clickButtonByText("Listele");
+        sleep(8000);
         try {
-            Thread.sleep(8000); // Statik bekleme
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        // Tablo kolonunun geldiğini doğrula
-        try {
-            By kolonKontrol = By.name("Fiş Türü");
-            new WebDriverWait(driver, maxWaitSeconds)
-                    .until(ExpectedConditions.presenceOfElementLocated(kolonKontrol));
-            System.out.println("✅ Fiş Türü kolonu bulundu, listeleme başarılı.");
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.name("Fiş Türü")));
         } catch (Exception e) {
             System.out.println("❌ Listele sonrası tablo yüklenmedi: " + e.getMessage());
         }
     }
+
     public void clickButtonByText(String visibleText) {
         try {
-            System.out.println("🔍 '" + visibleText + "' butonu XPath @Name ile aranıyor...");
             WebElement btn = driver.findElement(By.xpath("//*[contains(@Name, '" + visibleText + "')]"));
-            if (btn.isDisplayed() && btn.isEnabled()) {
-                btn.click();
-                System.out.println("✅ '" + visibleText + "' butonuna tıklandı (XPath @Name ile).");
-                return;
-            } else {
-                System.out.println("⚠️ Buton bulundu ama aktif değil.");
-            }
+            btn.click();
         } catch (Exception e) {
-            System.out.println("⚠️ XPath @Name ile tıklama başarısız: " + e.getMessage());
-        }
-
-        System.out.println("🖱️ Koordinat ile tıklama deneniyor...");
-        ElementHelper.clickByCoordinates(1157, 291);
-        System.out.println("✅ Koordinat ile tıklama tamamlandı.");
-    }
-
-
-//    public void clickButtonByText(String visibleText) {
-//        try {
-//            WebElement btn = new WebDriverWait(driver, 10).until(
-//                    ExpectedConditions.elementToBeClickable(
-//                            By.xpath("//button[.//span[normalize-space(text())='" + visibleText + "']]")
-//                    )
-//            );
-//            btn.click();
-//            System.out.println("✅ '" + visibleText + "' butonuna tıklandı (XPath ile).");
-//        } catch (Exception e) {
-//            System.out.println("⚠️ XPath ile tıklama başarısız, koordinat denenecek...");
-//            ElementHelper.clickByCoordinates(1157, 291);
-//            System.out.println("🖱️ Koordinat ile tıklama tamamlandı.");
-//        }
-//    }
-
-    // 1️⃣ Scroll'u sağa kaydırmak için kullanılır
-    public static void scrollRightWithRobot() {
-        try {
-            Robot robot = new Robot();
-            robot.mouseMove(1700, 1020);  // Scroll bar üzerine odaklan
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.mouseMove(1850, 1020);  // Scroll sağa çek
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            System.out.println("✅ Scroll bar sağa kaydırıldı.");
-            Thread.sleep(1000); // tablo yüklemesi için bekle
-        } catch (Exception e) {
-            System.out.println("❌ Scroll bar kaydırılamadı: " + e.getMessage());
+            ElementHelper.clickByCoordinates(1157, 291);
         }
     }
 
-    // 2️⃣ Durumu "Eksik Bilgi Bulunuyor" olan satırı bul ve checkbox'ı işaretle
-    public void selectRowWithDurum(String durumText) {
-        scrollRightWithRobot(); // Scroll yapmadan önce kolon görünmez olabilir
-
-        try {
-            List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
-            for (WebElement row : rows) {
-                try {
-                    // Satırdaki "Durum" hücresini bul
-                    WebElement durumCell = row.findElement(By.xpath(".//td[normalize-space()='Eksik Bilgi Bulunuyor']"));
-
-
-                    if (durumCell != null && durumCell.getText().trim().equalsIgnoreCase(durumText)) {
-                        // Aynı satırda checkbox'ı bul ve tıkla
-                        WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
-                        if (!checkbox.isSelected()) {
-                            checkbox.click();
-                            System.out.println("✅ '" + durumText + "' durumundaki satır işaretlendi.");
-                        } else {
-                            System.out.println("ℹ️ Checkbox zaten seçiliydi.");
-                        }
-                        return;
-                    }
-
-                } catch (Exception inner) {
-                    // Satırda "durum" hücresi yoksa hata verme, sıradakine geç
-                }
-            }
-
-            System.out.println("❌ '" + durumText + "' durumuna sahip satır bulunamadı.");
-
-        } catch (Exception e) {
-            System.out.println("❌ Satır/checkbox seçiminde genel hata: " + e.getMessage());
-        }
+    public void testEkstreCheckboxSecimi() {
+        selectFirstCheckbox();
+        clickScrollRightArrowWithRobot();
+        selectRowWithDurum("Eksik Bilgi Bulunuyor");
     }
 
     public void selectFirstCheckbox() {
         try {
-            // 1️⃣ Checkbox'ı saran label'ı bul
             WebElement label = driver.findElement(By.xpath("(//label[contains(@class,'ant-checkbox-wrapper')])[1]"));
-
-            // 2️⃣ İçindeki input'u bulup kontrol et
             WebElement input = label.findElement(By.xpath(".//input[@type='checkbox']"));
-
-            if (!input.isSelected()) {
-                label.click();  // Tıklanabilir olan öğe label’dır
-                System.out.println("✅ İlk satırdaki checkbox işaretlendi.");
-            } else {
-                System.out.println("ℹ️ İlk checkbox zaten seçili.");
-            }
+            if (!input.isSelected()) label.click();
         } catch (Exception e) {
             System.out.println("❌ İlk checkbox seçilemedi: " + e.getMessage());
         }
     }
 
-    public static void clickScrollRightArrowWithRobot() {
+    public void selectRowWithDurum(String durumText) {
+//        scrollRightWithRobot();
         try {
-            Robot robot = new Robot();
-            robot.mouseMove(1844, 1011); // Scroll bar sağ ok koordinatı
-            Thread.sleep(300);
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(400); // kısa basılı tut
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            System.out.println("✅ Scroll sağ oku tıklandı.");
+            List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                try {
+                    WebElement durumCell = row.findElement(By.xpath(".//td[normalize-space()='" + durumText + "']"));
+                    WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                    if (!checkbox.isSelected()) checkbox.click();
+                    return;
+                } catch (Exception ignored) {}
+            }
         } catch (Exception e) {
-            System.out.println("❌ Scroll oku tıklanamadı: " + e.getMessage());
+            System.out.println("❌ Satır/checkbox seçiminde hata: " + e.getMessage());
         }
     }
-    public void testEkstreCheckboxSecimi() {
-        selectFirstCheckbox(); // İlk checkbox'ı seç
-        clickScrollRightArrowWithRobot(); // Scroll sağa
-        selectRowWithDurum("Eksik Bilgi Bulunuyor"); // Eksik satırı seç
-    }
-
 
     public void changeFisTypeTo(String menu, String fisTuru) {
         Actions actions = new Actions(driver);
-        WebElement selectedRow = driver.findElement(By.xpath("//*[contains(@Name, 'Seçildi')]")); // örnek: seçilen satır
-
+        WebElement selectedRow = driver.findElement(By.xpath("//*[contains(@Name, 'Seçildi')]"));
         actions.contextClick(selectedRow).perform();
-
-        WebElement menuElement = wait.until(ExpectedConditions.elementToBeClickable(By.name(menu)));
-        menuElement.click();
-
-        WebElement fisOption = wait.until(ExpectedConditions.elementToBeClickable(By.name(fisTuru)));
-        fisOption.click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.name(menu))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.name(fisTuru))).click();
     }
 
     public boolean isFisTuruUpdated(String expectedText) {
         try {
             WebElement updatedCell = driver.findElement(By.xpath("//*[contains(@Name, '" + expectedText + "')]"));
-            return updatedCell != null && updatedCell.isDisplayed();
+            return updatedCell.isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -313,18 +152,17 @@ public class EkstreAktarimiPage {
     public boolean isDurumColumnShows(String durumText) {
         try {
             WebElement durum = driver.findElement(By.xpath("//*[contains(@Name, '" + durumText + "')]"));
-            return durum != null && durum.isDisplayed();
+            return durum.isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
     public void clickErpCariKodDots() {
-        List<WebElement> ucNoktaButonlari = driver.findElements(By.name("..."));
-        for (WebElement ucNokta : ucNoktaButonlari) {
-            // Muhtemelen boş olan alanların yanında olur
-            if (ucNokta.isDisplayed()) {
-                ucNokta.click();
+        List<WebElement> dots = driver.findElements(By.name("..."));
+        for (WebElement dot : dots) {
+            if (dot.isDisplayed()) {
+                dot.click();
                 break;
             }
         }
@@ -332,7 +170,25 @@ public class EkstreAktarimiPage {
 
     public void selectFirstCariFromPopup() {
         WebElement firstCari = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//DataItem[1]")));
-        Actions actions = new Actions(driver);
-        actions.doubleClick(firstCari).perform();
+        new Actions(driver).doubleClick(firstCari).perform();
+    }
+
+    public static void clickScrollRightArrowWithRobot() {
+        try {
+            Robot robot = new Robot();
+            robot.mouseMove(1844, 1011);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            Thread.sleep(400);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        } catch (Exception e) {
+            System.out.println("❌ Scroll oku tıklanamadı: " + e.getMessage());
+        }
+    }
+
+    private void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ignored) {
+        }
     }
 }

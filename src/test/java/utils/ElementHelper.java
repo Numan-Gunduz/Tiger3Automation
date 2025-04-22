@@ -5,17 +5,17 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.By;
+import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.Rectangle;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
@@ -187,100 +187,147 @@ public class ElementHelper {
         System.out.println("⏳ Pencere bulunamadı: " + title);
         return false;
     }
-    public static WebElement waitUntilClickable(WindowsDriver driver, String by, String value, int timeoutSeconds) {
-        By locator = getBy(by, value);
-        return new WebDriverWait(driver,  Duration.ofSeconds(timeoutSeconds))
-                .until(ExpectedConditions.elementToBeClickable(locator));
-    }
 
-    public static WebElement waitUntilVisible(WindowsDriver driver, String by, String value, int timeoutSeconds) {
-        By locator = getBy(by, value);
-        return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
-                .until(ExpectedConditions.visibilityOfElementLocated(locator));
-    }
 
-    private static By getBy(String type, String value) {
-        switch (type.toLowerCase()) {
-            case "id":
-            case "accessibilityid":
-                return MobileBy.AccessibilityId(value);
-            case "name":
-                return MobileBy.name(value);
-            default:
-                throw new IllegalArgumentException("❌ Desteklenmeyen locator tipi: " + type);
-        }
-    }
-    public static void clickByRobot(WebElement element) {
+
+
+
+
+
+    public static void waitForPageLoad(WebDriver driver, int timeoutInSeconds) {
         try {
-            Point point = element.getLocation();
-            Dimension size = element.getSize();
-            int centerX = point.getX() + size.getWidth() / 2;
-            int centerY = point.getY() + size.getHeight() / 2;
-
-            Robot robot = new Robot();
-            Thread.sleep(300);
-            robot.mouseMove(centerX, centerY);
-            Thread.sleep(200);
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(100);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(200);
-            robot.keyPress(java.awt.event.KeyEvent.VK_ENTER);
-            robot.keyRelease(java.awt.event.KeyEvent.VK_ENTER);
-
-            System.out.println("✅ Robot ile tıklama ve ENTER gönderildi: x=" + centerX + ", y=" + centerY);
-        } catch (Exception e) {
-            System.out.println("❌ Robot ile tıklama hatası: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void selectDropdownOption(WindowsDriver driver, String visibleText) {
-        try {
-            List<WebElement> options = driver.findElements(By.className("ant-select-item-option"));
-            for (WebElement option : options) {
-                if (option.getText().trim().equalsIgnoreCase(visibleText)) {
-                    option.click();
-                    System.out.println("✅ DOM üzerinden '" + visibleText + "' seçildi.");
-                    return;
-                }
+            // Sadece Selenium WebDriver (örneğin EdgeDriver) ise çalıştır
+            if (driver.getClass().getName().contains("EdgeDriver") || driver instanceof JavascriptExecutor) {
+                new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds)).until(
+                        webDriver -> ((JavascriptExecutor) webDriver)
+                                .executeScript("return document.readyState")
+                                .equals("complete")
+                );
+            } else {
+                System.out.println("⏭️ Driver tipi desteklenmiyor → " + driver.getClass().getSimpleName() + " (waitForPageLoad atlandı)");
             }
-
-            // DOM başarısızsa, elementi tekrar bul ve robotla tıkla
-            System.out.println("⚠️ DOM'da '" + visibleText + "' bulunamadı, Robot ile devam ediliyor...");
-            WebElement freshElement = driver.findElement(By.name(visibleText));
-            clickByRobot(freshElement);
-
         } catch (Exception e) {
-            System.out.println("❌ '" + visibleText + "' seçilemedi.");
-            throw new RuntimeException(e);
+            System.out.println("⚠️ waitForPageLoad exception: " + e.getMessage());
         }
     }
-    public static void clickTextByRobotIfVisible(WindowsDriver driver, String visibleText) {
-        try {
-            WebElement element = driver.findElement(By.xpath("//*[text()='" + visibleText + "']"));
-            clickByRobot(element);
-            System.out.println("✅ Robot ile tıklama başarılı: " + visibleText);
-        } catch (Exception e) {
-            System.out.println("❌ '" + visibleText + "' bulunamadı veya robot ile tıklanamadı: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+
+
+
+    public static void waitForTextInElement(WebDriver driver, By locator, String expectedText, int timeoutInSeconds) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, expectedText));
     }
-    public static void clickByCoordinates(int x, int y) {
+
+
+
+//    public static void maximizeWindowWithRobot(String partialTitle) {
+//        System.out.println("⏳ Maximize işlemi başlatılıyor: " + partialTitle);
+//
+//        HWND[] foundWindow = new HWND[1];
+//
+//        boolean result = User32.INSTANCE.EnumWindows((hWnd, data) -> {
+//            char[] windowText = new char[512];
+//            User32.INSTANCE.GetWindowTextW(hWnd, windowText, 512);
+//            String wText = Native.toString(windowText).trim();
+//            System.out.println("🔍 Mevcut pencere: " + wText);
+//
+//            if (wText.contains(partialTitle)) {
+//                foundWindow[0] = hWnd;
+//                System.out.println("🎯 Hedef pencere bulundu: " + wText);
+//                return false; // pencere bulundu, dur
+//            }
+//            return true; // devam et
+//        }, null);
+//
+//        if (foundWindow[0] == null) {
+//            throw new RuntimeException("❌ Pencere bulunamadı: " + partialTitle);
+//        }
+//
+//        // Pencere restore ediliyor (minimize'den çıkarılıyor)
+//        // Pencereyi bulduktan sonra:
+//        User32Extra.INSTANCE.ShowWindow(foundWindow[0], 3); // SW_MAXIMIZE
+//        System.out.println("🪟 ShowWindow (maximize) çağrıldı.");
+//
+//        boolean foregroundResult = User32.INSTANCE.SetForegroundWindow(foundWindow[0]);
+//        if (!foregroundResult) {
+//            throw new RuntimeException("⚠️ SetForegroundWindow başarısız! Pencere ön plana alınamadı: " + partialTitle);
+//        }
+//
+//
+//        try {
+//            Robot robot = new Robot();
+//            robot.mouseMove(100, 100); // küçük bir odaklanma hilesi
+//            robot.delay(800);
+//            robot.keyPress(KeyEvent.VK_ALT);
+//            robot.keyPress(KeyEvent.VK_SPACE);
+//            robot.keyRelease(KeyEvent.VK_SPACE);
+//            robot.keyRelease(KeyEvent.VK_ALT);
+//
+//            Thread.sleep(500);
+//
+//            robot.keyPress(KeyEvent.VK_X);
+//            robot.keyRelease(KeyEvent.VK_X);
+//
+//            System.out.println("✅ Robot ile pencere maximize komutu gönderildi.");
+//        } catch (Exception e) {
+//            throw new RuntimeException("❌ Maximize işlemi başarısız!", e);
+//        }
+//    }
+
+    public static void maximizeWindowWithRobot(String partialTitle) {
+        System.out.println("⏳ Maximize işlemi başlatılıyor: " + partialTitle);
+
+        HWND[] foundWindow = new HWND[1];
+
+        // Pencere başlığını tararken logları kaldırdık
+        User32.INSTANCE.EnumWindows((hWnd, data) -> {
+            char[] windowText = new char[512];
+            User32.INSTANCE.GetWindowTextW(hWnd, windowText, 512);
+            String wText = Native.toString(windowText).trim();
+
+            if (wText.contains(partialTitle)) {
+                foundWindow[0] = hWnd;
+                return false;
+            }
+            return true;
+        }, null);
+
+        if (foundWindow[0] == null) {
+            throw new RuntimeException("❌ Pencere bulunamadı: " + partialTitle);
+        }
+
+        // Maximize (3 = SW_MAXIMIZE)
+        User32Extra.INSTANCE.ShowWindow(foundWindow[0], 3);
+
+        boolean foregroundResult = User32.INSTANCE.SetForegroundWindow(foundWindow[0]);
+        if (!foregroundResult) {
+            throw new RuntimeException("⚠️ SetForegroundWindow başarısız! Pencere ön plana alınamadı: " + partialTitle);
+        }
+
         try {
             Robot robot = new Robot();
-            robot.mouseMove(x, y);
-            Thread.sleep(200);
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            System.out.println("🖱️ Koordinata tıklama yapıldı: x=" + x + ", y=" + y);
+            robot.mouseMove(100, 100); // Odak için küçük bir hareket
+            robot.delay(800);
+
+            robot.keyPress(KeyEvent.VK_ALT);
+            robot.keyPress(KeyEvent.VK_SPACE);
+            robot.keyRelease(KeyEvent.VK_SPACE);
+            robot.keyRelease(KeyEvent.VK_ALT);
+
+            Thread.sleep(500);
+
+            robot.keyPress(KeyEvent.VK_X);
+            robot.keyRelease(KeyEvent.VK_X);
+
+            System.out.println("✅ Robot ile pencere maximize komutu gönderildi.");
         } catch (Exception e) {
-            System.out.println("❌ Koordinata tıklama başarısız: " + e.getMessage());
+            throw new RuntimeException("❌ Maximize işlemi başarısız!", e);
         }
     }
 
 
 
-}
+
+    }
 
 

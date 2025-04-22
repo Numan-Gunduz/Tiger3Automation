@@ -66,12 +66,7 @@ public class Hooks {
         ElementHelper.waitForWindowByTitle(APP_NAME, 5);
         ElementHelper.switchToWindowByTitle(APP_NAME);
 
-        // Gerekirse ikinci giriş ekranı için kontrol
-        LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(driver);
-        loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.123456");
 
-        ElementHelper.waitUntilClickable(driver, "name", "Ana Sayfa", 15);
-        System.out.println("✅ Sayfa etkileşim için hazır, testler başlıyor...");
 
 // WebView2 ekranı için Selenium WebDriver başlat
         try {
@@ -79,11 +74,25 @@ public class Hooks {
 
             WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
             context.setWebDriver(seleniumDriver);
+Thread.sleep(1000);
 
-            // ⚠️ DOM yüklendikten sonra Ana Sayfa butonu veya ekranı için statik bekleme koy
-            System.out.println("⏳ Ana sayfa yüklenmesi bekleniyor (maks. 15 saniye)...");
-            Thread.sleep(3000); // Statik bekleme
-            System.out.println("✅ Ana sayfanın yüklendiği varsayıldı. Teste geçiliyor.");
+// 🔽 Bunu buraya yerleştir
+
+                ElementHelper.maximizeWindowWithRobot("Online Hesap Özeti Uygulaması");
+
+
+
+
+            // Gerekirse ikinci giriş ekranı için kontrol
+            LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(seleniumDriver);
+            loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.123456");
+
+
+            System.out.println("Sayfanın yüklendiğinden kesin emin olmak için 6 saniye statik bekleme eklendi");
+            Thread.sleep(6000);
+            System.out.println("Statik bekleme sona erdi.");
+
+
 
             System.out.println("✅ [Hooks] Selenium WebDriver aktifleştirildi. DOM üzerinden testlere geçildi.");
             System.out.println("🔍 Başlık: " + seleniumDriver.getTitle());

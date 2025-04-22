@@ -34,6 +34,7 @@ public class Hooks {
 
     @Before
     public void setUp(Scenario scenario) {
+        LogSilencer.silenceSeleniumWarnings(); // 🔇 Bu satır çok önemli
         System.out.println("🚀 Test başlatılıyor: " + scenario.getName());
 
         System.out.println("Appium server başlatılıyor");

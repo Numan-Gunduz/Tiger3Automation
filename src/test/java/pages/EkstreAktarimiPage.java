@@ -383,6 +383,105 @@ public class EkstreAktarimiPage {
 
 
 
+    public void clickFisOlusturButton() {
+        try {
+            WebElement host = webDriver.findElement(By.cssSelector("logo-elements-button[theme='primary']"));
+            SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) webDriver)
+                    .executeScript("return arguments[0].shadowRoot", host);
+
+            WebElement span = shadowRoot.findElement(By.cssSelector("span[part='label']"));
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", span);
+
+            System.out.println("✅ 'Fiş Oluştur' butonuna başarıyla tıklandı.");
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Fiş Oluştur butonuna tıklanırken hata: " + e.getMessage());
+        }
+    }
+
+    public void clickEvetOnConfirmationPopup() {
+        try {
+            WebElement evetBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//button[contains(@class, 'ant-btn-primary')]//span[text()='Evet']")));
+            evetBtn.click();
+            System.out.println("✅ Onay popup'ındaki 'Evet' butonuna tıklandı.");
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 'Evet' butonuna tıklanırken hata: " + e.getMessage());
+        }
+    }
+
+    public boolean isSuccessToastMessageVisible() {
+        try {
+            WebElement toast = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'Hesap ekstresi kayıtlarına ait fiş oluşturma süreci tamamlandı')]")));
+            System.out.println("✅ Başarı mesajı göründü.");
+            return toast.isDisplayed();
+        } catch (Exception e) {
+            System.out.println("❌ Toast mesajı görünmedi: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean isDurumEslendiGorunuyor() {
+        try {
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int durumIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                String header = headers.get(i).getText().trim();
+                if (header.equalsIgnoreCase("Durum")) {
+                    durumIndex = i + 1;
+                    break;
+                }
+            }
+
+            if (durumIndex == -1) throw new RuntimeException("❌ 'Durum' sütunu bulunamadı.");
+
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                if (row.findElement(By.xpath(".//input[@type='checkbox']")).isSelected()) {
+                    WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
+                    String text = durumCell.getText().trim();
+                    return text.equalsIgnoreCase("Eşlendi");
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            System.out.println("❌ Durum eşleşme kontrol hatası: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean isErpFisNoDolu() {
+        try {
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int fisNoIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                if (headers.get(i).getText().trim().equalsIgnoreCase("ERP Fiş No")) {
+                    fisNoIndex = i + 1;
+                    break;
+                }
+            }
+
+            if (fisNoIndex == -1) throw new RuntimeException("❌ 'ERP Fiş No' sütunu bulunamadı.");
+
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                if (row.findElement(By.xpath(".//input[@type='checkbox']")).isSelected()) {
+                    String text = row.findElement(By.xpath("./td[" + fisNoIndex + "]")).getText().trim();
+                    return !text.isEmpty();
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            System.out.println("❌ ERP Fiş No kontrolünde hata: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+
 }
 
 

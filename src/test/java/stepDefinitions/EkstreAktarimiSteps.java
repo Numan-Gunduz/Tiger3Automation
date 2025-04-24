@@ -93,6 +93,33 @@ public class EkstreAktarimiSteps {
         Assert.assertTrue(result, "❌ Durum sütunu 'Kaydedilebilir' değil!");
         System.out.println("✅ Durum sütunu doğru şekilde 'Kaydedilebilir' oldu.");
     }
+    @And("Fiş oluştur butonuna tıklar")
+    public void fisOlusturTiklar() {
+        page.clickFisOlusturButton();
+    }
+
+    @And("Açılan onay popup'ında Evet'e tıklar")
+    public void evetTiklar() {
+        page.clickEvetOnConfirmationPopup();
+    }
+
+    @Then("Kaydın başarı ile eşleştiği yeşil bilgi kutucuğu görüntülenir")
+    public void toastGorunur() {
+        boolean result = page.isSuccessToastMessageVisible();
+        Assert.assertTrue(result, "❌ Toast başarı mesajı görünmedi!");
+    }
+
+    @Then("Durum alanı Eşlendi olarak güncellenmelidir")
+    public void durumEslendiOlmali() {
+        boolean result = page.isDurumEslendiGorunuyor();
+        Assert.assertTrue(result, "❌ Durum 'Eşlendi' değil!");
+    }
+
+    @Then("ERP Fiş No alanı dolu olmalıdır")
+    public void erpFisNoDoluOlmali() {
+        boolean result = page.isErpFisNoDolu();
+        Assert.assertTrue(result, "❌ ERP Fiş No alanı boş!");
+    }
 
 }
 

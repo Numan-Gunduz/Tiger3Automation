@@ -14,3 +14,8 @@ Feature: Ekstre Aktarımı Senaryosu
     When ERP Cari Hesap Kodu alanındaki üç noktaya tıklar
     And Açılan pencerede seç butonuna tıklar
     Then ERP Cari Hesap Kodu alanı dolduğunda, Durum sütunu "Kaydedilebilir" olarak güncellenir
+    And Fiş oluştur butonuna tıklar
+    And Açılan onay popup'ında Evet'e tıklar
+    Then Kaydın başarı ile eşleştiği yeşil bilgi kutucuğu görüntülenir
+    Then Durum alanı Eşlendi olarak güncellenmelidir
+    Then ERP Fiş No alanı dolu olmalıdır

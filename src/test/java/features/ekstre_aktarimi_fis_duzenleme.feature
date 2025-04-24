@@ -12,5 +12,5 @@ Feature: Ekstre Aktarımı Senaryosu
     Then Fiş türünün "Havale/EFT Fişi" olarak güncellendiği doğrulanır
     And ERP Cari Hesap Kodu boş olan satırda, Durum alanı 'Eksik Bilgi Bulunuyor' olmalıdır
     When ERP Cari Hesap Kodu alanındaki üç noktaya tıklar
-    And Açılan pencerede ilk satırdaki cari hesap değerine çift tıklar
+    And Açılan pencerede seç butonuna tıklar
     Then ERP Cari Hesap Kodu alanı dolduğunda, Durum sütunu "Kaydedilebilir" olarak güncellenir

@@ -15,7 +15,8 @@ public class EkstreAktarimiSteps {
 
     public EkstreAktarimiSteps(TestContext context) {
         this.context = context;
-        this.page = new EkstreAktarimiPage(context.getWebDriver());
+        this.page = new EkstreAktarimiPage(context);
+
     }
 
     @Given("Kullanıcı sisteme başarılı şekilde giriş yapmış ve ana sayfa tamamen yüklenmiştir")
@@ -81,14 +82,17 @@ public class EkstreAktarimiSteps {
         page.clickErpCariKodDots();
     }
 
-    @And("Açılan pencerede ilk satırdaki cari hesap değerine çift tıklar")
+    @And("Açılan pencerede seç butonuna tıklar")
     public void cariSec() {
-        page.selectFirstCariFromPopup();
+        page.clickSelectButtonOnCariPopup();
     }
 
     @Then("ERP Cari Hesap Kodu alanı dolduğunda, Durum sütunu {string} olarak güncellenir")
-    public void durumKaydedilebilir(String durum) {
-        assert page.isDurumColumnShows(durum);
+    public void durumKaydedilebilir(String expectedDurum) {
+        boolean result = page.isDurumKaydedilebilirGorunuyor();
+        Assert.assertTrue(result, "❌ Durum sütunu 'Kaydedilebilir' değil!");
+        System.out.println("✅ Durum sütunu doğru şekilde 'Kaydedilebilir' oldu.");
     }
+
 }
 

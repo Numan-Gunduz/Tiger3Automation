@@ -1,24 +1,39 @@
 package pages;
 
+import base.TestContext;
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import io.appium.java_client.windows.WindowsDriver;
+
+import io.appium.java_client.windows.WindowsDriver;
+
+import io.appium.java_client.MobileBy;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import io.appium.java_client.windows.WindowsDriver;
+
 
 public class EkstreAktarimiPage {
 
-    private final WebDriver driver;
+    private final TestContext context;
+    private final WebDriver webDriver;    // WebView2 için
+    private final WindowsDriver winDriver; // Win32 popup için
     private final WebDriverWait wait;
 
-    public EkstreAktarimiPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+    public EkstreAktarimiPage(TestContext context) {
+        this.context = context;
+        this.webDriver = context.getWebDriver();         // WebView2 için
+        this.winDriver = context.getWindowsDriver();     // Win32 popup için
+        this.wait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
     }
+
 
     public void clickSidebarMenu(String menuText) {
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(
@@ -61,6 +76,7 @@ public class EkstreAktarimiPage {
             throw e;
         }
     }
+
     public void enterStartDateDaysAgo(int daysAgo) {
         try {
             LocalDate targetDate = LocalDate.now().minusDays(daysAgo);
@@ -83,18 +99,17 @@ public class EkstreAktarimiPage {
     }
 
 
-
     public void clickListele() {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+            //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
             // 🎯 Shadow DOM içindeki 'Listele' butonunun host elementini bul
-            WebElement host = driver.findElement(By.cssSelector("logo-elements-button[theme='secondary']"));
-            SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) driver)
+            WebElement host = webDriver.findElement(By.cssSelector("logo-elements-button[theme='secondary']"));
+            SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) webDriver)
                     .executeScript("return arguments[0].shadowRoot", host);
 
             WebElement span = shadowRoot.findElement(By.cssSelector("span[part='label']"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", span);
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", span);
             System.out.println("✅ Listele butonuna başarıyla JS ile tıklandı.");
 
             // "Lütfen bekleyiniz..." mesajının görünüp sonra kaybolmasını bekle
@@ -119,11 +134,8 @@ public class EkstreAktarimiPage {
     }
 
 
-
-
-
     public void selectRowWithDurum(String durumText) {
-        List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
+        List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
         for (WebElement row : rows) {
             try {
                 List<WebElement> cells = row.findElements(By.tagName("td"));
@@ -148,8 +160,6 @@ public class EkstreAktarimiPage {
     }
 
 
-
-
     public void changeFisTypeTo(String contextMenuText, String fisTuru) {
         try {
             // Tablo üzerindeki bir alanı bul (örneğin "Fiş Türü" başlığı olabilir)
@@ -157,7 +167,7 @@ public class EkstreAktarimiPage {
                     By.xpath("//th[contains(.,'Fiş Türü')]")));
 
             // Sağ tık aksiyonu tetikleniyor
-            new Actions(driver).contextClick(tableArea).perform();
+            new Actions(webDriver).contextClick(tableArea).perform();
             System.out.println("✅ Sağ tık başarıyla yapıldı.");
 
             // "Fiş Türü Değiştir" menüsünü tıkla
@@ -183,7 +193,7 @@ public class EkstreAktarimiPage {
 
     public boolean isFisTuruUpdated(String expectedText) {
         try {
-            List<WebElement> cells = driver.findElements(By.xpath("//*[contains(text(),'" + expectedText + "')]"));
+            List<WebElement> cells = webDriver.findElements(By.xpath("//*[contains(text(),'" + expectedText + "')]"));
             for (WebElement cell : cells) {
                 if (cell.isDisplayed()) {
                     return true;
@@ -200,7 +210,7 @@ public class EkstreAktarimiPage {
     public boolean validateDurumForEmptyCariHesap(String expectedDurumText) {
         try {
             // Başlıkların index'lerini bul
-            List<WebElement> headers = driver.findElements(By.xpath("//thead//th"));
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
             int cariHesapIndex = -1;
             int durumIndex = -1;
 
@@ -219,7 +229,7 @@ public class EkstreAktarimiPage {
             }
 
             // Satırları gez ve sadece seçilmiş checkbox olan satırı bul
-            List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
             for (WebElement row : rows) {
                 WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
                 if (checkbox.isSelected()) {
@@ -253,101 +263,127 @@ public class EkstreAktarimiPage {
 
 
 
-    public boolean isDurumColumnShows(String expectedDurum) {
+
+
+    public void clickErpCariKodDots() {
         try {
-            List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
-
-            for (WebElement row : rows) {
-                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
-                boolean isChecked = checkbox.isSelected();
-
-                if (isChecked) {
-                    List<WebElement> cells = row.findElements(By.tagName("td"));
-
-                    for (WebElement cell : cells) {
-                        String text = cell.getText().trim();
-                        if (text.equals(expectedDurum)) {
-                            System.out.println("✅ Seçilen satırda '" + expectedDurum + "' bulundu.");
-                            return true;
-                        }
-                    }
-
-                    System.out.println("❌ Seçilen satırda '" + expectedDurum + "' bulunamadı.");
-                    return false;
-                }
-            }
-
-            System.out.println("❌ Hiçbir satır seçili değil.");
-            return false;
-        } catch (Exception e) {
-            System.out.println("❌ Durum kontrol hatası: " + e.getMessage());
-            return false;
-        }
-    }
-
-
-public void clickErpCariKodDots() {
-    try {
-        // 1️⃣ ERP Cari Hesap Kodu sütun index'ini bul
-        List<WebElement> headers = driver.findElements(By.xpath("//table//thead//th"));
-        int targetIndex = -1;
-        for (int i = 0; i < headers.size(); i++) {
-            if (headers.get(i).getText().trim().equals("ERP Cari Hesap Kodu")) {
-                targetIndex = i;
-                break;
-            }
-        }
-
-        if (targetIndex == -1)
-            throw new RuntimeException("❌ 'ERP Cari Hesap Kodu' başlığı bulunamadı.");
-
-        System.out.println("🔎 ERP Cari Hesap Kodu sütun index: " + targetIndex);
-
-        // 2️⃣ Satırları bul ve checkbox'ı seçili olanı bul
-        List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
-        WebElement selectedRow = null;
-
-        for (WebElement row : rows) {
-            try {
-                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
-                if (checkbox.isSelected()) {
-                    selectedRow = row;
+            // 1️⃣ ERP Cari Hesap Kodu sütun index'ini bul
+            List<WebElement> headers = webDriver.findElements(By.xpath("//table//thead//th"));
+            int targetIndex = -1;
+            for (int i = 0; i < headers.size(); i++) {
+                if (headers.get(i).getText().trim().equals("ERP Cari Hesap Kodu")) {
+                    targetIndex = i;
                     break;
                 }
-            } catch (Exception ignored) {}
+            }
+
+            if (targetIndex == -1)
+                throw new RuntimeException("❌ 'ERP Cari Hesap Kodu' başlığı bulunamadı.");
+
+            System.out.println("🔎 ERP Cari Hesap Kodu sütun index: " + targetIndex);
+
+            // 2️⃣ Satırları bul ve checkbox'ı seçili olanı bul
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            WebElement selectedRow = null;
+
+            for (WebElement row : rows) {
+                try {
+                    WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                    if (checkbox.isSelected()) {
+                        selectedRow = row;
+                        break;
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (selectedRow == null)
+                throw new RuntimeException("❌ Seçili (checked) satır bulunamadı.");
+
+            // 3️⃣ Doğru hücreyi al
+            List<WebElement> cells = selectedRow.findElements(By.tagName("td"));
+            if (targetIndex >= cells.size())
+                throw new RuntimeException("❌ ERP Cari Hesap Kodu sütununa denk gelen hücre yok.");
+
+            WebElement targetCell = cells.get(targetIndex);
+
+            // 4️⃣ Hücredeki üç nokta butonunu bul
+            WebElement host = targetCell.findElement(By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']"));
+
+            // 5️⃣ Scroll + JS click
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", host);
+            Thread.sleep(300); // scroll sonrası küçük gecikme
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", host);
+
+            System.out.println("✅ ERP Cari Hesap Kodu alanındaki üç nokta butonuna başarıyla tıklandı.");
+
+        } catch (Exception e) {
+            System.out.println("❌ Üç nokta tıklanırken hata: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-
-        if (selectedRow == null)
-            throw new RuntimeException("❌ Seçili (checked) satır bulunamadı.");
-
-        // 3️⃣ Doğru hücreyi al
-        List<WebElement> cells = selectedRow.findElements(By.tagName("td"));
-        if (targetIndex >= cells.size())
-            throw new RuntimeException("❌ ERP Cari Hesap Kodu sütununa denk gelen hücre yok.");
-
-        WebElement targetCell = cells.get(targetIndex);
-
-        // 4️⃣ Hücredeki üç nokta butonunu bul
-        WebElement host = targetCell.findElement(By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']"));
-
-        // 5️⃣ Scroll + JS click
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", host);
-        Thread.sleep(300); // scroll sonrası küçük gecikme
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", host);
-
-        System.out.println("✅ ERP Cari Hesap Kodu alanındaki üç nokta butonuna başarıyla tıklandı.");
-
-    } catch (Exception e) {
-        System.out.println("❌ Üç nokta tıklanırken hata: " + e.getMessage());
-        throw new RuntimeException(e);
     }
+
+
+    public void clickSelectButtonOnCariPopup() {
+        try {
+            WebElement selectButton = winDriver.findElement(MobileBy.AccessibilityId("SelBtn"));
+            selectButton.click();
+            System.out.println("✅ 'Seç' butonuna başarıyla tıklandı.");
+        } catch (Exception e) {
+            System.out.println("❌ 'Seç' butonuna tıklarken hata: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    public boolean isDurumKaydedilebilirGorunuyor() {
+        try {
+            // Başlık indexlerini bul
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int cariHesapIndex = -1;
+            int durumIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                String headerText = headers.get(i).getText().trim();
+                if (headerText.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
+                    cariHesapIndex = i + 1;
+                }
+                if (headerText.equalsIgnoreCase("Durum")) {
+                    durumIndex = i + 1;
+                }
+            }
+
+            if (cariHesapIndex == -1 || durumIndex == -1) {
+                throw new RuntimeException("❌ 'ERP Cari Hesap Kodu' veya 'Durum' sütunu bulunamadı.");
+            }
+
+            // Satırları gez, seçili olan checkbox'ı bul
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (checkbox.isSelected()) {
+                    WebElement cariCell = row.findElement(By.xpath("./td[" + cariHesapIndex + "]"));
+                    WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
+
+                    String cariValue = cariCell.getText().trim();
+                    String durumValue = durumCell.getText().trim();
+
+                    System.out.println("🔍 Cari: '" + cariValue + "', Durum: '" + durumValue + "'");
+
+                    return !cariValue.isEmpty() && durumValue.equalsIgnoreCase("Kaydedilebilir");
+                }
+            }
+
+            System.out.println("❌ Seçili satır bulunamadı.");
+            return false;
+
+        } catch (Exception e) {
+            System.out.println("❌ Durum kontrolünde hata: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+
 }
 
 
 
-
-    public void selectFirstCariFromPopup() {
-        WebElement firstCari = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//DataItem[1]")));
-        new Actions(driver).doubleClick(firstCari).perform();
-    }
-}

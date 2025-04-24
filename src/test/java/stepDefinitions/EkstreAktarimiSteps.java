@@ -37,6 +37,12 @@ public class EkstreAktarimiSteps {
     public void hesap_dropdown_sec(String iban) {
         page.selectAccount(iban);
     }
+    @And("Kullanıcı başlangıç tarihi olarak bugünden {int} gün önceki tarihi girer")
+    public void kullanici_dinamik_baslangic_tarihi_girer(int daysAgo) {
+        page.enterStartDateDaysAgo(daysAgo);
+    }
+
+
 
     @And("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
     public void butona_tikla(String btnText) {

@@ -6,6 +6,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class EkstreAktarimiPage {
@@ -59,6 +61,28 @@ public class EkstreAktarimiPage {
             throw e;
         }
     }
+    public void enterStartDateDaysAgo(int daysAgo) {
+        try {
+            LocalDate targetDate = LocalDate.now().minusDays(daysAgo);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String formattedDate = targetDate.format(formatter);
+
+            WebElement dateInput = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.cssSelector("logo-elements-date-picker input[slot='input']")));
+
+            dateInput.click();
+            dateInput.clear();
+            dateInput.sendKeys(formattedDate);
+            dateInput.sendKeys(Keys.ENTER);
+
+            System.out.println("✅ Başlangıç tarihi olarak " + formattedDate + " girildi (" + daysAgo + " gün önce).");
+        } catch (Exception e) {
+            System.out.println("❌ Dinamik tarih girilemedi: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public void clickListele() {
         try {
@@ -153,7 +177,7 @@ public class EkstreAktarimiPage {
         }
     }
 
-
+//buraya Assert ile doğrulama eklenecek
     public boolean isFisTuruUpdated(String expectedText) {
         try {
             WebElement updatedCell = driver.findElement(By.xpath("//*[contains(@Name, '" + expectedText + "')]"));
@@ -162,6 +186,7 @@ public class EkstreAktarimiPage {
             return false;
         }
     }
+    //buradaki tabloların sütün bilgisi yerie direk olarak dinamik bulacağımız şekilde eklemeliyiz
     public boolean  validateDurumForEmptyCariHesap(String expectedDurumText) {
         try {
             List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));

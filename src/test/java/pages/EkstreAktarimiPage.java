@@ -86,35 +86,39 @@ public class EkstreAktarimiPage {
 
     public void clickListele() {
         try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
             // 🎯 Shadow DOM içindeki 'Listele' butonunun host elementini bul
             WebElement host = driver.findElement(By.cssSelector("logo-elements-button[theme='secondary']"));
-
-            // 🧩 ShadowRoot'a geçiş yap
             SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) driver)
                     .executeScript("return arguments[0].shadowRoot", host);
 
-            // 🔍 Gömülü label içindeki görünür span'ı bul
             WebElement span = shadowRoot.findElement(By.cssSelector("span[part='label']"));
-
-            // 👆 Doğrudan JavaScript ile tıkla (çünkü native click() bloklanıyor)
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", span);
             System.out.println("✅ Listele butonuna başarıyla JS ile tıklandı.");
 
-            // ⏳ Statik bekleme
-            System.out.println("⏱️ Statik olarak 6 saniye bekleniyor...");
-            Thread.sleep(6000);
+            // "Lütfen bekleyiniz..." mesajının görünüp sonra kaybolmasını bekle
+            wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'Verilerinizi bankalardan listeliyoruz')]")));
+            System.out.println("⏳ 'Lütfen bekleyiniz' mesajı göründü.");
 
-            // 🔄 Dinamik olarak "Fiş Türü" başlığını bekle
-            System.out.println("🔍 'Fiş Türü' başlığının yüklenmesi dinamik olarak bekleniyor...");
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//th[contains(.,'Fiş Türü')]")));
-            System.out.println("✅ Tablonun yüklenmesi tamamlandı.");
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'Verilerinizi bankalardan listeliyoruz')]")));
+            System.out.println("⏱️ 'Lütfen bekleyiniz' mesajı kapandı.");
+
+            // 🔍 Tablo veri hücrelerinden birinin (örneğin "Fiş Türü") göründüğünden emin ol
+            // Not: Bu, bir tablo hücresi. Başlık değil. Arka planda grid/table yapısına bağlı olarak değişebilir.
+            wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'Havale/EFT Fişi')]")));
+            System.out.println("✅ Kayıtlar başarıyla yüklendi.");
 
         } catch (Exception e) {
-            System.out.println("❌ Listele tıklama hatası: " + e.getMessage());
+            System.out.println("❌ Listeleme sürecinde hata: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
+
+
 
 
 

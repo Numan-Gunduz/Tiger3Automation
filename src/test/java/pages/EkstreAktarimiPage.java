@@ -288,9 +288,28 @@ public class EkstreAktarimiPage {
 
 
     public void clickErpCariKodDots() {
-        WebElement dotButton = wait.until(ExpectedConditions.elementToBeClickable(By.name("...")));
-        dotButton.click();
+        try {
+            WebElement host = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']")));
+
+            // Shadow root'a eriş
+            SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) driver)
+                    .executeScript("return arguments[0].shadowRoot", host);
+
+            // Bu sefer svg yerine doğrudan shadow host'u JS ile tıklayacağız
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", host);
+            Thread.sleep(300); // ufak gecikme
+
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", host);
+            System.out.println("✅ Üç nokta butonuna (host element) başarıyla tıklandı (JS).");
+
+        } catch (Exception e) {
+            System.out.println("❌ Üç nokta tıklanırken JS hatası: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
+
+
 
     public void selectFirstCariFromPopup() {
         WebElement firstCari = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//DataItem[1]")));

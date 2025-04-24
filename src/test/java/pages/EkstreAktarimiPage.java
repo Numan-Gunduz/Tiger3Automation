@@ -181,37 +181,76 @@ public class EkstreAktarimiPage {
         }
     }
 
-//buraya Assert ile doğrulama eklenecek
     public boolean isFisTuruUpdated(String expectedText) {
         try {
-            WebElement updatedCell = driver.findElement(By.xpath("//*[contains(@Name, '" + expectedText + "')]"));
-            return updatedCell.isDisplayed();
+            List<WebElement> cells = driver.findElements(By.xpath("//*[contains(text(),'" + expectedText + "')]"));
+            for (WebElement cell : cells) {
+                if (cell.isDisplayed()) {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
+            System.out.println("❌ Fiş türü kontrolü sırasında hata: " + e.getMessage());
             return false;
         }
     }
+
     //buradaki tabloların sütün bilgisi yerie direk olarak dinamik bulacağımız şekilde eklemeliyiz
-    public boolean  validateDurumForEmptyCariHesap(String expectedDurumText) {
+    public boolean validateDurumForEmptyCariHesap(String expectedDurumText) {
         try {
+            // Başlıkların index'lerini bul
+            List<WebElement> headers = driver.findElements(By.xpath("//thead//th"));
+            int cariHesapIndex = -1;
+            int durumIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                String headerText = headers.get(i).getText().trim();
+                if (headerText.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
+                    cariHesapIndex = i + 1;
+                }
+                if (headerText.equalsIgnoreCase("Durum")) {
+                    durumIndex = i + 1;
+                }
+            }
+
+            if (cariHesapIndex == -1 || durumIndex == -1) {
+                throw new RuntimeException("❌ 'ERP Cari Hesap Kodu' veya 'Durum' başlığı bulunamadı.");
+            }
+
+            // Satırları gez ve sadece seçilmiş checkbox olan satırı bul
             List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
             for (WebElement row : rows) {
-                String cariHesap = row.findElement(By.xpath("./td[normalize-space()='']")).getText().trim();
-                String durum = row.findElement(By.xpath("./td[6]")).getText().trim(); // Alternatif: td[contains(.,'Eksik Bilgi')]
-                if (cariHesap.isEmpty()) {
-                    if (!durum.equals(expectedDurumText)) {
-                        System.out.println("❌ Hatalı Durum: Beklenen '" + expectedDurumText + "' ama bulundu: '" + durum + "'");
-                        return false;
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (checkbox.isSelected()) {
+                    WebElement cariHesapCell = row.findElement(By.xpath("./td[" + cariHesapIndex + "]"));
+                    WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
+
+                    String cariHesapText = cariHesapCell.getText().trim();
+                    String durumText = durumCell.getText().trim();
+
+                    if (cariHesapText.isEmpty()) {
+                        if (!durumText.equals(expectedDurumText)) {
+                            System.out.println("❌ Durum hatalı! Beklenen: '" + expectedDurumText + "', Bulunan: '" + durumText + "'");
+                            return false;
+                        } else {
+                            System.out.println("✅ Doğru: Cari hesap boş ve Durum alanı doğru: '" + durumText + "'");
+                            return true;
+                        }
                     } else {
-                        System.out.println("✅ Doğru: ERP Cari Hesap Kodu boş ve Durum '" + expectedDurumText + "'");
+                        System.out.println("ℹ️ Cari hesap boş değil, kontrol edilmedi.");
                     }
                 }
             }
-            return true;
+
+            System.out.println("❌ Seçilen ve cari hesabı boş olan satır bulunamadı.");
+            return false;
         } catch (Exception e) {
             System.out.println("❌ Hata oluştu: " + e.getMessage());
             return false;
         }
     }
+
 
 
     public boolean isDurumColumnShows(String expectedDurum) {

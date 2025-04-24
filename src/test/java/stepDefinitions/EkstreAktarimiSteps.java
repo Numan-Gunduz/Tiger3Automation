@@ -60,14 +60,20 @@ public class EkstreAktarimiSteps {
     }
 
     @Then("Fiş türünün {string} olarak güncellendiği doğrulanır")
-    public void fisTuruDogrulama(String text) {
-        assert page.isFisTuruUpdated(text);
+    public void fisTuruDogrulama(String expectedText) {
+        boolean result = page.isFisTuruUpdated(expectedText);
+        Assert.assertTrue(result, "❌ Fiş türü beklenen gibi güncellenmedi! Beklenen: " + expectedText);
+        System.out.println("✅ Fiş türü doğru şekilde güncellendi: " + expectedText);
     }
+
 
     @And("ERP Cari Hesap Kodu boş olan satırda, Durum alanı {string} olmalıdır")
     public void validateDurumByExpectedValue(String expectedDurumText) {
-        assert page.validateDurumForEmptyCariHesap(expectedDurumText);
+        boolean result = page.validateDurumForEmptyCariHesap(expectedDurumText);
+        Assert.assertTrue(result, "❌ Doğrulama başarısız! ERP Cari Hesap boşken durum yanlış.");
     }
+
+
 
 
     @When("ERP Cari Hesap Kodu alanındaki üç noktaya tıklar")

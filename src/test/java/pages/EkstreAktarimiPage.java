@@ -286,28 +286,63 @@ public class EkstreAktarimiPage {
     }
 
 
-
-    public void clickErpCariKodDots() {
-        try {
-            WebElement host = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']")));
-
-            // Shadow root'a eriş
-            SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) driver)
-                    .executeScript("return arguments[0].shadowRoot", host);
-
-            // Bu sefer svg yerine doğrudan shadow host'u JS ile tıklayacağız
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", host);
-            Thread.sleep(300); // ufak gecikme
-
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", host);
-            System.out.println("✅ Üç nokta butonuna (host element) başarıyla tıklandı (JS).");
-
-        } catch (Exception e) {
-            System.out.println("❌ Üç nokta tıklanırken JS hatası: " + e.getMessage());
-            throw new RuntimeException(e);
+public void clickErpCariKodDots() {
+    try {
+        // 1️⃣ ERP Cari Hesap Kodu sütun index'ini bul
+        List<WebElement> headers = driver.findElements(By.xpath("//table//thead//th"));
+        int targetIndex = -1;
+        for (int i = 0; i < headers.size(); i++) {
+            if (headers.get(i).getText().trim().equals("ERP Cari Hesap Kodu")) {
+                targetIndex = i;
+                break;
+            }
         }
+
+        if (targetIndex == -1)
+            throw new RuntimeException("❌ 'ERP Cari Hesap Kodu' başlığı bulunamadı.");
+
+        System.out.println("🔎 ERP Cari Hesap Kodu sütun index: " + targetIndex);
+
+        // 2️⃣ Satırları bul ve checkbox'ı seçili olanı bul
+        List<WebElement> rows = driver.findElements(By.xpath("//tbody/tr"));
+        WebElement selectedRow = null;
+
+        for (WebElement row : rows) {
+            try {
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (checkbox.isSelected()) {
+                    selectedRow = row;
+                    break;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        if (selectedRow == null)
+            throw new RuntimeException("❌ Seçili (checked) satır bulunamadı.");
+
+        // 3️⃣ Doğru hücreyi al
+        List<WebElement> cells = selectedRow.findElements(By.tagName("td"));
+        if (targetIndex >= cells.size())
+            throw new RuntimeException("❌ ERP Cari Hesap Kodu sütununa denk gelen hücre yok.");
+
+        WebElement targetCell = cells.get(targetIndex);
+
+        // 4️⃣ Hücredeki üç nokta butonunu bul
+        WebElement host = targetCell.findElement(By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']"));
+
+        // 5️⃣ Scroll + JS click
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", host);
+        Thread.sleep(300); // scroll sonrası küçük gecikme
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", host);
+
+        System.out.println("✅ ERP Cari Hesap Kodu alanındaki üç nokta butonuna başarıyla tıklandı.");
+
+    } catch (Exception e) {
+        System.out.println("❌ Üç nokta tıklanırken hata: " + e.getMessage());
+        throw new RuntimeException(e);
     }
+}
+
 
 
 

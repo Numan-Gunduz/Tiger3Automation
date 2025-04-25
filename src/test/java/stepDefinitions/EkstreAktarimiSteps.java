@@ -117,8 +117,8 @@ public class EkstreAktarimiSteps {
 
     @Then("ERP Fiş No alanı dolu olmalıdır")
     public void erpFisNoDoluOlmali() {
-        boolean result = page.isErpFisNoDolu();
-        Assert.assertTrue(result, "❌ ERP Fiş No alanı boş!");
+        Assert.assertTrue(page.isErpFisNoDoluMu(), "❌ ERP Fiş No alanı boş!");
+
     }
 
 }

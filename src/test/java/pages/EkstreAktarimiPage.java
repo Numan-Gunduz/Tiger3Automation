@@ -478,35 +478,37 @@ public void selectRowWithDurum(String durumText) {
     }
 
 
-
-    public boolean isErpFisNoDolu() {
+    public boolean isErpFisNoDoluMu() {
         try {
+            if (selectedRowElement == null)
+                throw new RuntimeException("❌ Önceden seçilen satır kaydedilmemiş.");
+
             List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
             int fisNoIndex = -1;
 
             for (int i = 0; i < headers.size(); i++) {
-                if (headers.get(i).getText().trim().equalsIgnoreCase("ERP Fiş No")) {
+                String header = headers.get(i).getText().trim();
+                if (header.equalsIgnoreCase("ERP Fiş No")) {
                     fisNoIndex = i + 1;
                     break;
                 }
             }
 
-            if (fisNoIndex == -1) throw new RuntimeException("❌ 'ERP Fiş No' sütunu bulunamadı.");
+            if (fisNoIndex == -1)
+                throw new RuntimeException("❌ 'ERP Fiş No' sütunu bulunamadı.");
 
-            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
-            for (WebElement row : rows) {
-                if (row.findElement(By.xpath(".//input[@type='checkbox']")).isSelected()) {
-                    String text = row.findElement(By.xpath("./td[" + fisNoIndex + "]")).getText().trim();
-                    return !text.isEmpty();
-                }
-            }
+            WebElement fisNoCell = selectedRowElement.findElement(By.xpath("./td[" + fisNoIndex + "]"));
+            String text = fisNoCell.getText().trim();
+            System.out.println("🔍 Seçilen satırdaki ERP Fiş No: '" + text + "'");
 
-            return false;
+            return !text.isEmpty();
+
         } catch (Exception e) {
-            System.out.println("❌ ERP Fiş No kontrolünde hata: " + e.getMessage());
+            System.out.println("❌ ERP Fiş No kontrol hatası: " + e.getMessage());
             return false;
         }
     }
+
 
 
 

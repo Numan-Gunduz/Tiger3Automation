@@ -21,6 +21,7 @@ import io.appium.java_client.windows.WindowsDriver;
 
 
 public class EkstreAktarimiPage {
+    private WebElement selectedRowElement; // en son işlem yapılan satır
 
     private final TestContext context;
     private final WebDriver webDriver;    // WebView2 için
@@ -134,30 +135,55 @@ public class EkstreAktarimiPage {
     }
 
 
-    public void selectRowWithDurum(String durumText) {
-        List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
-        for (WebElement row : rows) {
-            try {
-                List<WebElement> cells = row.findElements(By.tagName("td"));
+//    public void selectRowWithDurum(String durumText) {
+//        List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+//        for (WebElement row : rows) {
+//            try {
+//                List<WebElement> cells = row.findElements(By.tagName("td"));
+//
+//                for (WebElement cell : cells) {
+//                    String cellText = cell.getText().trim();
+//                    if (cellText.equals(durumText)) { // contains DEĞİL!
+//                        WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+//                        if (!checkbox.isSelected()) {
+//                            checkbox.click();
+//                            System.out.println("✅ Checkbox işaretlendi: " + durumText);
+//                        }
+//                        return;
+//                    }
+//                }
+//            } catch (Exception e) {
+//                System.out.println("❌ Satırda seçim yapılırken hata: " + e.getMessage());
+//            }
+//        }
+//
+//        throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
+//    }
+public void selectRowWithDurum(String durumText) {
+    List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+    for (WebElement row : rows) {
+        try {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
 
-                for (WebElement cell : cells) {
-                    String cellText = cell.getText().trim();
-                    if (cellText.equals(durumText)) { // contains DEĞİL!
-                        WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
-                        if (!checkbox.isSelected()) {
-                            checkbox.click();
-                            System.out.println("✅ Checkbox işaretlendi: " + durumText);
-                        }
-                        return;
+            for (WebElement cell : cells) {
+                String cellText = cell.getText().trim();
+                if (cellText.equalsIgnoreCase(durumText)) {
+                    WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                    if (!checkbox.isSelected()) {
+                        checkbox.click();
+                        System.out.println("✅ Checkbox işaretlendi: " + durumText);
                     }
+                    selectedRowElement = row; // 📌 Satırı sakla
+                    return;
                 }
-            } catch (Exception e) {
-                System.out.println("❌ Satırda seçim yapılırken hata: " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.out.println("❌ Satırda seçim yapılırken hata: " + e.getMessage());
         }
-
-        throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
     }
+
+    throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
+}
 
 
     public void changeFisTypeTo(String contextMenuText, String fisTuru) {
@@ -423,6 +449,9 @@ public class EkstreAktarimiPage {
 
     public boolean isDurumEslendiGorunuyor() {
         try {
+            if (selectedRowElement == null)
+                throw new RuntimeException("❌ Önceden seçilen satır kaydedilmemiş.");
+
             List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
             int durumIndex = -1;
 
@@ -434,22 +463,21 @@ public class EkstreAktarimiPage {
                 }
             }
 
-            if (durumIndex == -1) throw new RuntimeException("❌ 'Durum' sütunu bulunamadı.");
+            if (durumIndex == -1)
+                throw new RuntimeException("❌ 'Durum' sütunu bulunamadı.");
 
-            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
-            for (WebElement row : rows) {
-                if (row.findElement(By.xpath(".//input[@type='checkbox']")).isSelected()) {
-                    WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
-                    String text = durumCell.getText().trim();
-                    return text.equalsIgnoreCase("Eşlendi");
-                }
-            }
-            return false;
+            WebElement durumCell = selectedRowElement.findElement(By.xpath("./td[" + durumIndex + "]"));
+            String text = durumCell.getText().trim();
+            System.out.println("🔍 Seçilen satırdaki Durum: '" + text + "'");
+            return text.equalsIgnoreCase("Eşlendi");
+
         } catch (Exception e) {
             System.out.println("❌ Durum eşleşme kontrol hatası: " + e.getMessage());
             return false;
         }
     }
+
+
 
     public boolean isErpFisNoDolu() {
         try {

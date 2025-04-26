@@ -5,7 +5,7 @@ Feature: Ekstre Aktarımı Senaryosu
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Ziraat Bankası" seçer
     And Hesap dropdown'undan "TR030001000001573636455013" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 3 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 4 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Yüklenen ekstre kayıtlarından "Eksik Bilgi Bulunuyor" durumundaki bir kaydın solundaki seçim kutusunu işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Havale/EFT Fişi" seçeneğini seçer
@@ -19,3 +19,5 @@ Feature: Ekstre Aktarımı Senaryosu
     Then Kaydın başarı ile eşleştiği yeşil bilgi kutucuğu görüntülenir
     Then Durum alanı Eşlendi olarak güncellenmelidir
     Then ERP Fiş No alanı dolu olmalıdır
+    When Kullanıcı sağ tıklayıp "Fiş İncele" seçeneğini tıklar
+    Then Açılan ekrandaki Fiş No alanı ile ERP Fiş No değeri aynı olmalıdır

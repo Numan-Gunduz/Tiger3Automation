@@ -12,6 +12,7 @@ public class EkstreAktarimiSteps {
 
     TestContext context;
     EkstreAktarimiPage page;
+    private String kayitliErpFisNo;
 
     public EkstreAktarimiSteps(TestContext context) {
         this.context = context;
@@ -119,6 +120,20 @@ public class EkstreAktarimiSteps {
     public void erpFisNoDoluOlmali() {
         Assert.assertTrue(page.isErpFisNoDoluMu(), "❌ ERP Fiş No alanı boş!");
 
+    }
+    @When("Kullanıcı sağ tıklayıp {string} seçeneğini tıklar")
+    public void kullanici_sag_tiklayip_fis_incele_secenegini_tiklar(String secenek) {
+        kayitliErpFisNo = page.getErpFisNoFromSelectedRow(); // ERP fiş no'yu kaydet
+        page.openFisPopupFromContextMenu(secenek);
+    }
+
+    @Then("Açılan ekrandaki Fiş No alanı ile ERP Fiş No değeri aynı olmalıdır")
+    public void acilan_ekranda_fis_no_alanı_dogrulanmali() {
+        String popupFisNo = page.getFisNoFromPopup();
+        System.out.println("🔍 ERP'den alınan Fiş No: " + kayitliErpFisNo);
+        System.out.println("🔍 Açılan popup'taki Fiş No: " + popupFisNo);
+        Assert.assertEquals(popupFisNo, kayitliErpFisNo, "❌ Fiş no uyuşmuyor!");
+        System.out.println("✅ Açılan ekrandaki fiş no doğrulandı.");
     }
 
 }

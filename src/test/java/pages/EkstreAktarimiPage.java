@@ -27,6 +27,7 @@ public class EkstreAktarimiPage {
     private final WebDriver webDriver;    // WebView2 için
     private final WindowsDriver winDriver; // Win32 popup için
     private final WebDriverWait wait;
+    private String kayitliErpFisNo;
 
     public EkstreAktarimiPage(TestContext context) {
         this.context = context;
@@ -112,19 +113,19 @@ public class EkstreAktarimiPage {
             WebElement span = shadowRoot.findElement(By.cssSelector("span[part='label']"));
             ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", span);
             System.out.println("✅ Listele butonuna başarıyla JS ile tıklandı.");
-
+            WebDriverWait longWait = new WebDriverWait(webDriver, Duration.ofSeconds(45));
             // "Lütfen bekleyiniz..." mesajının görünüp sonra kaybolmasını bekle
-            wait.until(ExpectedConditions.visibilityOfElementLocated(
+            longWait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//*[contains(text(),'Verilerinizi bankalardan listeliyoruz')]")));
             System.out.println("⏳ 'Lütfen bekleyiniz' mesajı göründü.");
 
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+            longWait.until(ExpectedConditions.invisibilityOfElementLocated(
                     By.xpath("//*[contains(text(),'Verilerinizi bankalardan listeliyoruz')]")));
             System.out.println("⏱️ 'Lütfen bekleyiniz' mesajı kapandı.");
 
             // 🔍 Tablo veri hücrelerinden birinin (örneğin "Fiş Türü") göründüğünden emin ol
             // Not: Bu, bir tablo hücresi. Başlık değil. Arka planda grid/table yapısına bağlı olarak değişebilir.
-            wait.until(ExpectedConditions.visibilityOfElementLocated(
+            longWait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//*[contains(text(),'Havale/EFT Fişi')]")));
             System.out.println("✅ Kayıtlar başarıyla yüklendi.");
 
@@ -135,55 +136,52 @@ public class EkstreAktarimiPage {
     }
 
 
-//    public void selectRowWithDurum(String durumText) {
-//        List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
-//        for (WebElement row : rows) {
-//            try {
-//                List<WebElement> cells = row.findElements(By.tagName("td"));
-//
-//                for (WebElement cell : cells) {
-//                    String cellText = cell.getText().trim();
-//                    if (cellText.equals(durumText)) { // contains DEĞİL!
-//                        WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
-//                        if (!checkbox.isSelected()) {
-//                            checkbox.click();
-//                            System.out.println("✅ Checkbox işaretlendi: " + durumText);
-//                        }
-//                        return;
-//                    }
-//                }
-//            } catch (Exception e) {
-//                System.out.println("❌ Satırda seçim yapılırken hata: " + e.getMessage());
-//            }
-//        }
-//
-//        throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
-//    }
-public void selectRowWithDurum(String durumText) {
-    List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
-    for (WebElement row : rows) {
-        try {
-            List<WebElement> cells = row.findElements(By.tagName("td"));
 
-            for (WebElement cell : cells) {
-                String cellText = cell.getText().trim();
-                if (cellText.equalsIgnoreCase(durumText)) {
-                    WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
-                    if (!checkbox.isSelected()) {
-                        checkbox.click();
-                        System.out.println("✅ Checkbox işaretlendi: " + durumText);
+    public void selectRowWithDurum(String durumText) {
+        JavascriptExecutor js = (JavascriptExecutor) webDriver;
+        int maxScrollAttempts = 30;
+
+        for (int i = 0; i < maxScrollAttempts; i++) {
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            boolean durumBulundu = false;
+
+            for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+                try {
+                    WebElement row = webDriver.findElements(By.xpath("//tbody/tr")).get(rowIndex); // her seferinde taze bul
+                    js.executeScript("arguments[0].scrollIntoView({block: 'center'});", row);
+                    Thread.sleep(100); // scroll sonrası küçük bekleme
+
+                    List<WebElement> cells = row.findElements(By.tagName("td"));
+                    for (WebElement cell : cells) {
+                        String cellText = cell.getText().trim();
+                        if (cellText.equalsIgnoreCase(durumText)) {
+                            WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                            if (!checkbox.isSelected()) {
+                                checkbox.click();
+                            }
+                            selectedRowElement = row;
+                            System.out.println("✅ '" + durumText + "' satırı bulundu ve işaretlendi.");
+                            return;
+                        }
                     }
-                    selectedRowElement = row; // 📌 Satırı sakla
-                    return;
+                } catch (StaleElementReferenceException e) {
+                    System.out.println("⚠️ Stale element yakalandı, row yeniden alınacak...");
+                    continue;
+                } catch (Exception e) {
+                    System.out.println("⚠️ Diğer hata: " + e.getMessage());
                 }
             }
-        } catch (Exception e) {
-            System.out.println("❌ Satırda seçim yapılırken hata: " + e.getMessage());
+
+            // Eğer bu scroll turunda da bulunamadıysa aşağı kaydır
+            js.executeScript("window.scrollBy(0, 800);"); // daha küçük kaydırma
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException ignored) {}
         }
+
+        throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
     }
 
-    throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
-}
 
 
     public void changeFisTypeTo(String contextMenuText, String fisTuru) {
@@ -352,6 +350,11 @@ public void selectRowWithDurum(String durumText) {
 
     public void clickSelectButtonOnCariPopup() {
         try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        try {
             WebElement selectButton = winDriver.findElement(MobileBy.AccessibilityId("SelBtn"));
             selectButton.click();
             System.out.println("✅ 'Seç' butonuna başarıyla tıklandı.");
@@ -509,6 +512,73 @@ public void selectRowWithDurum(String durumText) {
         }
     }
 
+    public String getErpFisNoFromSelectedRow() {
+        if (selectedRowElement == null) {
+            throw new RuntimeException("❌ Önceden seçili satır yok.");
+        }
+
+        List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+        int fisNoIndex = -1;
+
+        for (int i = 0; i < headers.size(); i++) {
+            String header = headers.get(i).getText().trim();
+            if (header.equalsIgnoreCase("ERP Fiş No")) {
+                fisNoIndex = i + 1;
+                break;
+            }
+        }
+
+        if (fisNoIndex == -1)
+            throw new RuntimeException("❌ ERP Fiş No sütunu bulunamadı.");
+
+        WebElement fisNoCell = selectedRowElement.findElement(By.xpath("./td[" + fisNoIndex + "]"));
+        return fisNoCell.getText().trim();
+    }
+
+    public void openFisPopupFromContextMenu(String secenek) {
+        try {
+            if (selectedRowElement == null) {
+                throw new RuntimeException("❌ Sağ tıklanacak satır bulunamadı. 'selectedRowElement' boş!");
+            }
+
+            Actions actions = new Actions(webDriver);
+            actions.moveToElement(selectedRowElement).contextClick().perform(); // 📢 sadece satırın kendisine sağ tık yapıyoruz
+            System.out.println("✅ Seçili satıra başarıyla sağ tık yapıldı.");
+
+            Thread.sleep(500); // Menü açılması için küçük bekleme
+
+            By secenekLocator = By.xpath("//span[contains(@class,'menu-title-content') and text()='" + secenek + "']");
+
+            wait.until(ExpectedConditions.visibilityOfElementLocated(secenekLocator));
+            System.out.println("✅ '" + secenek + "' seçeneği görünür durumda.");
+
+            wait.until(ExpectedConditions.elementToBeClickable(secenekLocator));
+            WebElement secenekElement = webDriver.findElement(secenekLocator);
+            secenekElement.click();
+            System.out.println("✅ '" + secenek + "' seçeneğine başarıyla tıklandı.");
+
+            Thread.sleep(3000); // popup'ın açılması için sabit bekleme
+
+        } catch (Exception e) {
+            System.out.println("❌ '" + secenek + "' popup açılamadı: " + e.getMessage());
+            throw new RuntimeException("❌ '" + secenek + "' popup açılamadı: " + e.getMessage(), e);
+        }
+    }
+
+
+
+
+
+    public String getFisNoFromPopup() {
+        try {
+            WebElement fisNoField = winDriver.findElement(MobileBy.AccessibilityId("FicheNoEdit"));
+            String value = fisNoField.getText().trim();
+            System.out.println("📋 Popup içinden alınan fiş no: " + value);
+            return value;
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Win32 popup'tan Fiş No alınamadı: " + e.getMessage());
+        }
+    }
 
 
 

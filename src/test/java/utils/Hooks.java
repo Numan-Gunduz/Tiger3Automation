@@ -2,8 +2,7 @@
 package utils;
 
 import base.TestContext;
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
+
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
 import io.cucumber.java.After;
@@ -19,8 +18,7 @@ import pages.LoginPageOnlineOzet;
 import java.time.Duration;
 
 public class Hooks {
-    private static ExtentReports extent;
-    private static ExtentTest test;
+
     private static final String DEFAULT_USERNAME = "LOGO";
     private static final String DEFAULT_PASSWORD = "LOGO";
     private static final String DEFAULT_COMPANY = "1";
@@ -77,12 +75,9 @@ public class Hooks {
             context.setWebDriver(seleniumDriver);
 Thread.sleep(1000);
 
-// 🔽 Bunu buraya yerleştir
+
 
                 ElementHelper.maximizeWindowWithRobot("Online Hesap Özeti Uygulaması");
-
-
-
 
             // Gerekirse ikinci giriş ekranı için kontrol
             LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(seleniumDriver);

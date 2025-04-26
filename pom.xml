@@ -102,12 +102,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ✅ Extent Reports -->
-        <dependency>
-            <groupId>com.aventstack</groupId>
-            <artifactId>extentreports</artifactId>
-            <version>4.1.7</version>
-        </dependency>
+
 
         <!-- ✅ JNA (pencere handle) -->
         <dependency>

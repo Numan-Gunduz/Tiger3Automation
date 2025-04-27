@@ -136,5 +136,34 @@ public class EkstreAktarimiSteps {
         System.out.println("✅ Açılan ekrandaki fiş no doğrulandı.");
     }
 
+
+
+
+    /*jsdıooooooooooooooooooooooooooooo*/
+    @And("Yüklenen ekstre kayıtlarından {string} veya {string} durumundaki bir kaydın solundaki seçim kutusunu işaretler")
+    public void ekstreKaydiSec_VeyaDurum(String durum1, String durum2) {
+        page.selectRowWithDurumOrDurum(durum1, durum2);
+    }
+
+    @And("ERP Banka Hesap Kodu boş olan satırda, Durum alanı {string} olmalıdır")
+    public void validateDurumByExpectedValue_BankaKod(String expectedDurumText) {
+        boolean result = page.validateDurumForEmptyBankaHesap(expectedDurumText);
+        Assert.assertTrue(result, "❌ Doğrulama başarısız! ERP Banka Hesap Kodu boşken durum yanlış.");
+    }
+
+    @When("ERP Banka Hesap Kodu alanındaki üç noktaya tıklar")
+    public void ucNoktayaTiklar_BankaKod() {
+        page.clickErpBankaKodDots();
+    }
+
+    @Then("ERP Banka Hesap Kodu alanı dolduğunda, Durum sütunu {string} olarak güncellenir")
+    public void durumKaydedilebilir_BankaKod(String expectedDurum) {
+        boolean result = page.isDurumKaydedilebilirBankaKod();
+        Assert.assertTrue(result, "❌ Durum sütunu '" + expectedDurum + "' değil!");
+        System.out.println("✅ Durum sütunu doğru şekilde '" + expectedDurum + "' oldu.");
+    }
+
+
+
 }
 

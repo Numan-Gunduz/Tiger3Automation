@@ -1,5 +1,7 @@
 package pages;
 
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import base.TestContext;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
@@ -217,10 +219,21 @@ public class EkstreAktarimiPage {
 
     public boolean isFisTuruUpdated(String expectedText) {
         try {
+            // Önce sayfanın Fiş Türü kolonundaki yeni değerlerin gelmesini bekleyelim
+            WebDriverWait shortWait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+            shortWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(),'" + expectedText + "')]")));
+
+            // Şimdi güncel şekilde locate edip kontrol edelim
             List<WebElement> cells = webDriver.findElements(By.xpath("//*[contains(text(),'" + expectedText + "')]"));
             for (WebElement cell : cells) {
-                if (cell.isDisplayed()) {
-                    return true;
+                try {
+                    if (cell.isDisplayed()) {
+                        return true;
+                    }
+                } catch (StaleElementReferenceException stale) {
+                    System.out.println("⚠️ Stale element yakalandı, tekrar bulmaya çalışılıyor...");
+                    // Eğer stale olursa bile ignore edip devam etsin
+                    continue;
                 }
             }
             return false;
@@ -229,6 +242,7 @@ public class EkstreAktarimiPage {
             return false;
         }
     }
+
 
     //buradaki tabloların sütün bilgisi yerie direk olarak dinamik bulacağımız şekilde eklemeliyiz
     public boolean validateDurumForEmptyCariHesap(String expectedDurumText) {
@@ -348,21 +362,37 @@ public class EkstreAktarimiPage {
     }
 
 
+
     public void clickSelectButtonOnCariPopup() {
         try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        try {
+            System.out.println("✅ Bankalar popup açıldı. Şimdi ENTER gönderiliyor...");
+            Thread.sleep(2000); // Popup'ın tam yüklenmesini bekliyoruz
+
+            // 🎯 Gerçek klavye ile ENTER tuşuna bas
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            System.out.println("✅ Robot ile ENTER tuşu gönderildi.");
+
+            Thread.sleep(3000); // Yeni pencere açılması için biraz bekleme
+
+            // 🎯 Şimdi açılan pencerede Seç butonuna tıklıyoruz
             WebElement selectButton = winDriver.findElement(MobileBy.AccessibilityId("SelBtn"));
             selectButton.click();
             System.out.println("✅ 'Seç' butonuna başarıyla tıklandı.");
+
         } catch (Exception e) {
-            System.out.println("❌ 'Seç' butonuna tıklarken hata: " + e.getMessage());
+            System.out.println("❌ Banka seçimi sırasında hata oluştu: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
+
+
+
+
+
+
+
     public boolean isDurumKaydedilebilirGorunuyor() {
         try {
             // Başlık indexlerini bul
@@ -580,6 +610,209 @@ public class EkstreAktarimiPage {
         }
     }
 
+/*virman ile ilgili metotlar buraya gelecek */
+
+    // 📌 Yüklenen ekstre kayıtlarında "Eksik Bilgi Bulunuyor" veya "Kaydedilebilir" durumundaki satırı seç
+    public void selectRowWithDurumOrDurum(String durum1, String durum2) {
+        JavascriptExecutor js = (JavascriptExecutor) webDriver;
+        int maxScrollAttempts = 30;
+
+        for (int i = 0; i < maxScrollAttempts; i++) {
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+
+            for (WebElement row : rows) {
+                try {
+                    js.executeScript("arguments[0].scrollIntoView({block: 'center'});", row);
+                    Thread.sleep(100);
+
+                    List<WebElement> cells = row.findElements(By.tagName("td"));
+                    for (WebElement cell : cells) {
+                        String cellText = cell.getText().trim();
+                        if (cellText.equalsIgnoreCase(durum1) || cellText.equalsIgnoreCase(durum2)) {
+                            WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                            if (!checkbox.isSelected()) {
+                                checkbox.click();
+                            }
+                            selectedRowElement = row;
+                            System.out.println("✅ '" + cellText + "' durumlu satır bulundu ve işaretlendi.");
+                            return;
+                        }
+                    }
+                } catch (StaleElementReferenceException e) {
+                    System.out.println("⚠️ Stale element yakalandı, row yeniden alınacak...");
+                    continue;
+                } catch (Exception e) {
+                    System.out.println("⚠️ Diğer hata: " + e.getMessage());
+                }
+            }
+
+            js.executeScript("window.scrollBy(0, 800);");
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        throw new RuntimeException("❌ '" + durum1 + "' veya '" + durum2 + "' durumlu kayıt bulunamadı!");
+    }
+
+    // 📌 ERP Banka Hesap Kodu boşken, Durum değerini kontrol et
+    public boolean validateDurumForEmptyBankaHesap(String expectedDurumText) {
+        try {
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int bankaHesapIndex = -1;
+            int durumIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                String headerText = headers.get(i).getText().trim();
+                if (headerText.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
+                    bankaHesapIndex = i + 1;
+                }
+                if (headerText.equalsIgnoreCase("Durum")) {
+                    durumIndex = i + 1;
+                }
+            }
+
+            if (bankaHesapIndex == -1 || durumIndex == -1) {
+                throw new RuntimeException("❌ 'ERP Banka Hesap Kodu' veya 'Durum' başlığı bulunamadı.");
+            }
+
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (checkbox.isSelected()) {
+                    WebElement bankaHesapCell = row.findElement(By.xpath("./td[" + bankaHesapIndex + "]"));
+                    WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
+
+                    String bankaHesapText = bankaHesapCell.getText().trim();
+                    String durumText = durumCell.getText().trim();
+
+                    if (bankaHesapText.isEmpty()) {
+                        if (!durumText.equals(expectedDurumText)) {
+                            System.out.println("❌ Durum hatalı! Beklenen: '" + expectedDurumText + "', Bulunan: '" + durumText + "'");
+                            return false;
+                        } else {
+                            System.out.println("✅ Doğru: Banka hesap boş ve Durum doğru: '" + durumText + "'");
+                            return true;
+                        }
+                    } else {
+                        System.out.println("ℹ️ Banka hesap boş değil, kontrol edilmedi.");
+                    }
+                }
+            }
+
+            System.out.println("❌ Seçili ve banka hesabı boş olan satır bulunamadı.");
+            return false;
+        } catch (Exception e) {
+            System.out.println("❌ Hata oluştu: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // 📌 ERP Banka Hesap Kodu alanındaki üç noktaya tıkla
+    public void clickErpBankaKodDots() {
+        try {
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int targetIndex = -1;
+            for (int i = 0; i < headers.size(); i++) {
+                if (headers.get(i).getText().trim().equalsIgnoreCase("ERP Banka Hesap Kodu")) {
+                    targetIndex = i;
+                    break;
+                }
+            }
+
+            if (targetIndex == -1)
+                throw new RuntimeException("❌ 'ERP Banka Hesap Kodu' başlığı bulunamadı.");
+
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            WebElement selectedRow = null;
+            for (WebElement row : rows) {
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (checkbox.isSelected()) {
+                    selectedRow = row;
+                    break;
+                }
+            }
+
+            if (selectedRow == null)
+                throw new RuntimeException("❌ Seçili (checked) satır bulunamadı.");
+
+            List<WebElement> cells = selectedRow.findElements(By.tagName("td"));
+            if (targetIndex >= cells.size())
+                throw new RuntimeException("❌ ERP Banka Hesap Kodu hücresi bulunamadı.");
+
+            WebElement targetCell = cells.get(targetIndex);
+            WebElement host = targetCell.findElement(By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']"));
+
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", host);
+            Thread.sleep(300);
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", host);
+
+            System.out.println("✅ ERP Banka Hesap Kodu alanındaki üç noktaya başarıyla tıklandı.");
+
+        } catch (Exception e) {
+            System.out.println("❌ ERP Banka Hesap Kodu üç nokta tıklama hatası: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isDurumKaydedilebilirBankaKod() {
+        try {
+            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+            // Önce tablo satırlarının yüklendiğinden emin ol
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//tbody/tr")));
+
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int bankaHesapIndex = -1;
+            int durumIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                String headerText = headers.get(i).getText().trim();
+                if (headerText.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
+                    bankaHesapIndex = i + 1;
+                }
+                if (headerText.equalsIgnoreCase("Durum")) {
+                    durumIndex = i + 1;
+                }
+            }
+
+            if (bankaHesapIndex == -1 || durumIndex == -1)
+                throw new RuntimeException("❌ 'ERP Banka Hesap Kodu' veya 'Durum' başlığı bulunamadı.");
+
+            List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+            for (WebElement row : rows) {
+                try {
+                    WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                    if (checkbox.isSelected()) {
+                        List<WebElement> cells = row.findElements(By.tagName("td"));
+
+                        if (bankaHesapIndex - 1 >= cells.size() || durumIndex - 1 >= cells.size()) {
+                            System.out.println("❌ Hücre sayısı başlık sayısıyla uyuşmuyor.");
+                            return false;
+                        }
+
+                        String bankaValue = cells.get(bankaHesapIndex - 1).getText().trim();
+                        String durumValue = cells.get(durumIndex - 1).getText().trim();
+
+                        System.out.println("🔍 Banka Hesap: '" + bankaValue + "', Durum: '" + durumValue + "'");
+
+                        return !bankaValue.isEmpty() && durumValue.equalsIgnoreCase("Kaydedilebilir");
+                    }
+                } catch (StaleElementReferenceException staleEx) {
+                    System.out.println("⚠️ Stale element oluştu, satır atlandı.");
+                    continue;
+                }
+            }
+
+            System.out.println("❌ Seçili satır bulunamadı veya koşullar sağlanmadı.");
+            return false;
+
+        } catch (Exception e) {
+            System.out.println("❌ Banka Hesap kontrolünde hata: " + e.getMessage());
+            return false;
+        }
+    }
 
 
 }

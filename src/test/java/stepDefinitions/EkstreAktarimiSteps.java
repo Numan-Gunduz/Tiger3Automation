@@ -5,6 +5,7 @@ import io.cucumber.java.en.*;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import pages.EkstreAktarimiPage;
+import utils.DriverFactory;
 
 import static org.junit.Assert.assertTrue;
 
@@ -127,6 +128,15 @@ public class EkstreAktarimiSteps {
         page.openFisPopupFromContextMenu(secenek);
     }
 
+//    @Then("Açılan ekrandaki Fiş No alanı ile ERP Fiş No değeri aynı olmalıdır")
+//    public void acilan_ekranda_fis_no_alanı_dogrulanmali() {
+//        String popupFisNo = page.getFisNoFromPopup();
+//        System.out.println("🔍 ERP'den alınan Fiş No: " + kayitliErpFisNo);
+//        System.out.println("🔍 Açılan popup'taki Fiş No: " + popupFisNo);
+//        Assert.assertEquals(popupFisNo, kayitliErpFisNo, "❌ Fiş no uyuşmuyor!");
+//        System.out.println("✅ Açılan ekrandaki fiş no doğrulandı.");
+//    }
+
     @Then("Açılan ekrandaki Fiş No alanı ile ERP Fiş No değeri aynı olmalıdır")
     public void acilan_ekranda_fis_no_alanı_dogrulanmali() {
         String popupFisNo = page.getFisNoFromPopup();
@@ -137,9 +147,13 @@ public class EkstreAktarimiSteps {
     }
 
 
-
-
     /*jsdıooooooooooooooooooooooooooooo*/
+
+    @And("Banka kodu için Açılan pencerede seç butonuna tıklar")
+    public void cariSecBankaKodu() {
+        page.clickSelectButtonOnCariPopupBankaKodu();
+    }
+
     @And("Yüklenen ekstre kayıtlarından {string} veya {string} durumundaki bir kaydın solundaki seçim kutusunu işaretler")
     public void ekstreKaydiSec_VeyaDurum(String durum1, String durum2) {
         page.selectRowWithDurumOrDurum(durum1, durum2);

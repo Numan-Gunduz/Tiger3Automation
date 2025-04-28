@@ -14,6 +14,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DriverFactory {
@@ -75,6 +76,56 @@ public class DriverFactory {
             throw new RuntimeException("❌ Appium Server başlatılamadı: " + e.getMessage(), e);
         }
     }
+    public static WindowsDriver switchToPopupWindowByTitle(String expectedTitle, int timeoutSeconds) {
+        try {
+            System.out.println("🔍 Yeni popup bekleniyor: " + expectedTitle);
+            long end = System.currentTimeMillis() + timeoutSeconds * 1000;
+
+            while (System.currentTimeMillis() < end) {
+                AtomicReference<WinDef.HWND> hwndRef = new AtomicReference<>();
+
+                User32.INSTANCE.EnumWindows((hwnd, data) -> {
+                    char[] buffer = new char[512];
+                    User32.INSTANCE.GetWindowTextW(hwnd, buffer, 512);
+                    String windowTitle = Native.toString(buffer);
+
+                    if (windowTitle != null && !windowTitle.trim().isEmpty()) {
+                        if (windowTitle.contains(expectedTitle)) {
+                            hwndRef.set(hwnd);
+                            return false; // Buldum, dur
+                        }
+                    }
+                    return true; // Devam et
+                }, null);
+
+                if (hwndRef.get() != null) {
+                    Pointer hwndPointer = hwndRef.get().getPointer();
+                    long hwndLong = Pointer.nativeValue(hwndPointer);
+                    String hexHandle = String.format("0x%X", hwndLong);
+
+                    System.out.println("🪟 Yeni pencere bulundu. Handle: " + hexHandle);
+
+                    // Şimdi yeni bir session başlat
+                    DesiredCapabilities caps = new DesiredCapabilities();
+                    caps.setCapability("appTopLevelWindow", hexHandle);
+                    caps.setCapability("platformName", "Windows");
+                    caps.setCapability("deviceName", "WindowsPC");
+
+                    return new WindowsDriver(new URL("http://127.0.0.1:4723"), caps);
+                }
+
+                Thread.sleep(500);
+            }
+
+            throw new RuntimeException("❌ Timeout: Popup pencere bulunamadı: " + expectedTitle);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Yeni popup'a geçerken hata: " + e.getMessage(), e);
+        }
+    }
+
+
+
+
 
     public static WebDriver getSeleniumDriver() {
         if (seleniumDriver == null) {
@@ -125,6 +176,8 @@ public class DriverFactory {
                 caps.setCapability("appTopLevelWindow", hexHandle);
                 caps.setCapability("platformName", "Windows");
                 caps.setCapability("deviceName", "WindowsPC");
+                caps.setCapability("newCommandTimeout", 3000); // <-- Session'ı 3000 saniye aktif tutar (50 dakika)
+
 
                 winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), caps);
                 System.out.println("✅ ERP bağlantısı başarılı.");
@@ -138,6 +191,7 @@ public class DriverFactory {
 
     public static void quitDriver() {
         if (winDriver != null) {
+            winDriver.getTitle(); // Eğer burası hata vermezse, driver canlı
             winDriver.quit();
             winDriver = null;
         }

@@ -19,6 +19,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
+
 import io.appium.java_client.windows.WindowsDriver;
 
 
@@ -175,7 +177,7 @@ public class EkstreAktarimiPage {
             }
 
             // Eğer bu scroll turunda da bulunamadıysa aşağı kaydır
-            js.executeScript("window.scrollBy(0, 800);"); // daha küçük kaydırma
+            js.executeScript("window.scrollBy(0, 600);"); // daha küçük kaydırma
             try {
                 Thread.sleep(150);
             } catch (InterruptedException ignored) {}
@@ -366,6 +368,25 @@ public class EkstreAktarimiPage {
     public void clickSelectButtonOnCariPopup() {
         try {
             System.out.println("✅ Bankalar popup açıldı. Şimdi ENTER gönderiliyor...");
+            Thread.sleep(4000); // Popup'ın tam yüklenmesini bekliyoruz
+
+            // 🎯 Gerçek klavye ile ENTER tuşuna bas
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            System.out.println("✅ Robot ile ENTER tuşu gönderildi.");
+            Thread.sleep(300); // Yeni pencere açılması için biraz bekleme
+
+        } catch (Exception e) {
+            System.out.println("❌ Banka seçimi sırasında hata oluştu: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void clickSelectButtonOnCariPopupBankaKodu() {
+        try {
+            System.out.println("✅ Bankalar popup açıldı. Şimdi ENTER gönderiliyor...");
             Thread.sleep(2000); // Popup'ın tam yüklenmesini bekliyoruz
 
             // 🎯 Gerçek klavye ile ENTER tuşuna bas
@@ -386,8 +407,6 @@ public class EkstreAktarimiPage {
             throw new RuntimeException(e);
         }
     }
-
-
 
 
 
@@ -458,27 +477,55 @@ public class EkstreAktarimiPage {
     }
 
     public void clickEvetOnConfirmationPopup() {
-        try {
-            WebElement evetBtn = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//button[contains(@class, 'ant-btn-primary')]//span[text()='Evet']")));
-            evetBtn.click();
-            System.out.println("✅ Onay popup'ındaki 'Evet' butonuna tıklandı.");
-        } catch (Exception e) {
-            throw new RuntimeException("❌ 'Evet' butonuna tıklanırken hata: " + e.getMessage());
-        }
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
+        WebElement evetButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[contains(@class, 'ant-btn-primary') and .//span[text()='Evet']]")
+        ));
+
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", evetButton);
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", evetButton);
+
+        System.out.println("✅ 'Evet' butonuna tıklandı.");
     }
 
+
     public boolean isSuccessToastMessageVisible() {
+        String toastMessage = "Hesap ekstresi kayıtlarına ait fiş oluşturma süreci tamamlandı";
+        By toastLocator = By.xpath("//*[contains(text(),'" + toastMessage + "')]");
+
         try {
-            WebElement toast = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.xpath("//*[contains(text(),'Hesap ekstresi kayıtlarına ait fiş oluşturma süreci tamamlandı')]")));
-            System.out.println("✅ Başarı mesajı göründü.");
-            return toast.isDisplayed();
-        } catch (Exception e) {
-            System.out.println("❌ Toast mesajı görünmedi: " + e.getMessage());
+            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(30));
+            wait.pollingEvery(Duration.ofMillis(250));
+            wait.ignoring(NoSuchElementException.class, StaleElementReferenceException.class);
+
+            // Öncelikle toast mesajının DOM'a yüklenmesini bekleyelim
+            WebElement toast = wait.until(ExpectedConditions.presenceOfElementLocated(toastLocator));
+
+            // Toast'un görünürlüğünü kontrol etmek için alternatif yaklaşım
+            boolean isVisible = (Boolean)((JavascriptExecutor) webDriver).executeScript(
+                    "const elem = arguments[0];" +
+                            "const rect = elem.getBoundingClientRect();" +
+                            "return (" +
+                            "rect.width > 0 && rect.height > 0 && " +
+                            "window.getComputedStyle(elem).visibility !== 'hidden' && " +
+                            "window.getComputedStyle(elem).display !== 'none');",
+                    toast
+            );
+
+            if (isVisible) {
+                System.out.println("✅ Başarı mesajı gerçekten görünür durumda.");
+            } else {
+                System.out.println("⚠️ Başarı mesajı DOM'da mevcut fakat stil veya boyut nedeniyle görünmüyor.");
+            }
+
+            return isVisible;
+
+        } catch (TimeoutException e) {
+            System.out.println("❌ Toast mesajı zaman aşımına uğradı: " + e.getMessage());
             return false;
         }
     }
+
 
     public boolean isDurumEslendiGorunuyor() {
         try {
@@ -598,8 +645,12 @@ public class EkstreAktarimiPage {
 
 
 
-
     public String getFisNoFromPopup() {
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         try {
             WebElement fisNoField = winDriver.findElement(MobileBy.AccessibilityId("FicheNoEdit"));
             String value = fisNoField.getText().trim();
@@ -609,6 +660,9 @@ public class EkstreAktarimiPage {
             throw new RuntimeException("❌ Win32 popup'tan Fiş No alınamadı: " + e.getMessage());
         }
     }
+
+
+
 
 /*virman ile ilgili metotlar buraya gelecek */
 
@@ -759,7 +813,10 @@ public class EkstreAktarimiPage {
 
     public boolean isDurumKaydedilebilirBankaKod() {
         try {
-            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+
+            Thread.sleep(4000);
+
+            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
             // Önce tablo satırlarının yüklendiğinden emin ol
             wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//tbody/tr")));
 

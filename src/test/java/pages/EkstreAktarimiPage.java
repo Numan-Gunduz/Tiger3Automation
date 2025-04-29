@@ -526,11 +526,14 @@ public class EkstreAktarimiPage {
         }
     }
 
-
     public boolean isDurumEslendiGorunuyor() {
         try {
             if (selectedRowElement == null)
                 throw new RuntimeException("❌ Önceden seçilen satır kaydedilmemiş.");
+
+            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(20));
+            wait.pollingEvery(Duration.ofMillis(250));
+            wait.ignoring(StaleElementReferenceException.class, NoSuchElementException.class);
 
             List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
             int durumIndex = -1;
@@ -545,17 +548,30 @@ public class EkstreAktarimiPage {
 
             if (durumIndex == -1)
                 throw new RuntimeException("❌ 'Durum' sütunu bulunamadı.");
+            final int finalDurumIndex = durumIndex; // 🔥 Burada kopyaladık
+            // Durum hücresinin Eşlendi olmasını bekleyelim
+            boolean isMatched = wait.until(driver -> {
+                WebElement durumCell = selectedRowElement.findElement(By.xpath("./td[" + finalDurumIndex + "]"));
+                String durumText = durumCell.getText().trim();
+                System.out.println("⏳ Güncel Durum: " + durumText);
+                return durumText.equalsIgnoreCase("Eşlendi");
+            });
 
-            WebElement durumCell = selectedRowElement.findElement(By.xpath("./td[" + durumIndex + "]"));
-            String text = durumCell.getText().trim();
-            System.out.println("🔍 Seçilen satırdaki Durum: '" + text + "'");
-            return text.equalsIgnoreCase("Eşlendi");
+            if (isMatched) {
+                System.out.println("✅ Durum başarıyla 'Eşlendi' oldu.");
+            }
 
+            return isMatched;
+
+        } catch (TimeoutException te) {
+            System.out.println("❌ Durum zaman aşımı: Durum 'Eşlendi' olmadı.");
+            return false;
         } catch (Exception e) {
             System.out.println("❌ Durum eşleşme kontrol hatası: " + e.getMessage());
             return false;
         }
     }
+
 
 
     public boolean isErpFisNoDoluMu() {

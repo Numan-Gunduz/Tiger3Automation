@@ -40,7 +40,6 @@ public class EkstreAktarimiPage {
         this.wait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
     }
 
-
     public void clickSidebarMenu(String menuText) {
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//span[contains(@class,'ant-menu-title-content') and text()='" + menuText + "']")));
@@ -104,7 +103,6 @@ public class EkstreAktarimiPage {
         }
     }
 
-
     public void clickListele() {
         try {
             //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -139,21 +137,19 @@ public class EkstreAktarimiPage {
         }
     }
 
-
-
     public void selectRowWithDurum(String durumText) {
         JavascriptExecutor js = (JavascriptExecutor) webDriver;
-        int maxScrollAttempts = 30;
+        int maxScrollAttempts = 30; // Maksimum kaydırma denemesi
+        boolean durumBulundu = false;
 
         for (int i = 0; i < maxScrollAttempts; i++) {
             List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
-            boolean durumBulundu = false;
 
-            for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+            for (WebElement row : rows) {
                 try {
-                    WebElement row = webDriver.findElements(By.xpath("//tbody/tr")).get(rowIndex); // her seferinde taze bul
+                    // Her row'u merkeze al
                     js.executeScript("arguments[0].scrollIntoView({block: 'center'});", row);
-                    Thread.sleep(100); // scroll sonrası küçük bekleme
+                    Thread.sleep(100);
 
                     List<WebElement> cells = row.findElements(By.tagName("td"));
                     for (WebElement cell : cells) {
@@ -164,26 +160,28 @@ public class EkstreAktarimiPage {
                                 checkbox.click();
                             }
                             selectedRowElement = row;
-                            System.out.println("✅ '" + durumText + "' satırı bulundu ve işaretlendi.");
-                            return;
+                            System.out.println("✅ '" + durumText + "' durumlu satır bulundu ve işaretlendi.");
+                            return; // Satır bulunduğu anda metodu bitiriyoruz
                         }
                     }
                 } catch (StaleElementReferenceException e) {
-                    System.out.println("⚠️ Stale element yakalandı, row yeniden alınacak...");
+                    System.out.println("⚠️ Stale element yakalandı, satır yeniden alınacak...");
                     continue;
                 } catch (Exception e) {
-                    System.out.println("⚠️ Diğer hata: " + e.getMessage());
+                    System.out.println("⚠️ Hata oluştu: " + e.getMessage());
                 }
             }
 
             // Eğer bu scroll turunda da bulunamadıysa aşağı kaydır
-            js.executeScript("window.scrollBy(0, 600);"); // daha küçük kaydırma
+            js.executeScript("window.scrollBy(0, 800);");
             try {
-                Thread.sleep(150);
-            } catch (InterruptedException ignored) {}
+                Thread.sleep(200); // Biraz bekle (sayfa yüklenebilsin)
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        throw new RuntimeException("❌ '" + durumText + "' eşleşen satır bulunamadı!");
+        throw new RuntimeException("❌ '" + durumText + "' durumunda kayıt bulunamadı!");
     }
 
 
@@ -245,7 +243,6 @@ public class EkstreAktarimiPage {
         }
     }
 
-
     //buradaki tabloların sütün bilgisi yerie direk olarak dinamik bulacağımız şekilde eklemeliyiz
     public boolean validateDurumForEmptyCariHesap(String expectedDurumText) {
         try {
@@ -300,10 +297,6 @@ public class EkstreAktarimiPage {
             return false;
         }
     }
-
-
-
-
 
     public void clickErpCariKodDots() {
         try {
@@ -363,8 +356,6 @@ public class EkstreAktarimiPage {
         }
     }
 
-
-
     public void clickSelectButtonOnCariPopup() {
         try {
             System.out.println("✅ Bankalar popup açıldı. Şimdi ENTER gönderiliyor...");
@@ -382,7 +373,6 @@ public class EkstreAktarimiPage {
             throw new RuntimeException(e);
         }
     }
-
 
     public void clickSelectButtonOnCariPopupBankaKodu() {
         try {
@@ -407,10 +397,6 @@ public class EkstreAktarimiPage {
             throw new RuntimeException(e);
         }
     }
-
-
-
-
 
     public boolean isDurumKaydedilebilirGorunuyor() {
         try {
@@ -459,8 +445,6 @@ public class EkstreAktarimiPage {
         }
     }
 
-
-
     public void clickFisOlusturButton() {
         try {
             WebElement host = webDriver.findElement(By.cssSelector("logo-elements-button[theme='primary']"));
@@ -487,7 +471,6 @@ public class EkstreAktarimiPage {
 
         System.out.println("✅ 'Evet' butonuna tıklandı.");
     }
-
 
     public boolean isSuccessToastMessageVisible() {
         String toastMessage = "Hesap ekstresi kayıtlarına ait fiş oluşturma süreci tamamlandı";
@@ -572,8 +555,6 @@ public class EkstreAktarimiPage {
         }
     }
 
-
-
     public boolean isErpFisNoDoluMu() {
         try {
             if (selectedRowElement == null)
@@ -657,9 +638,6 @@ public class EkstreAktarimiPage {
             throw new RuntimeException("❌ '" + secenek + "' popup açılamadı: " + e.getMessage(), e);
         }
     }
-
-
-
 
     public String getFisNoFromPopup() {
         try {

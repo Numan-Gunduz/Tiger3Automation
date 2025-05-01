@@ -25,6 +25,7 @@ public class Hooks {
     private static final String APP_NAME = "Online Hesap Özeti Uygulaması";
 
     private final TestContext context;
+    private static boolean uygulamaZatenBaslatildi = false; // 💡 Sadece ilk testte başlat
 
     public Hooks(TestContext context) {
         this.context = context;
@@ -32,75 +33,67 @@ public class Hooks {
 
     @Before
     public void setUp(Scenario scenario) {
-        LogSilencer.silenceSeleniumWarnings(); // 🔇 Bu satır çok önemli
+        LogSilencer.silenceSeleniumWarnings();
         System.out.println("🚀 Test başlatılıyor: " + scenario.getName());
 
-        System.out.println("Appium server başlatılıyor");
-        DriverFactory.startAppiumServer();
-        // ERP uygulamasını başlat
-        DriverFactory.startERPApplication();
+        if (!uygulamaZatenBaslatildi) {
+            System.out.println("🔄 Uygulama ilk kez başlatılıyor...");
 
-        // Masaüstü ERP uygulamasına bağlan
-        WindowsDriver driver = DriverFactory.getWinDriver();
-        context.setWindowsDriver(driver);
+            DriverFactory.startAppiumServer();
+            DriverFactory.startERPApplication();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        System.out.println("📋 Giriş ekranı kontrol ediliyor...");
+            WindowsDriver driver = DriverFactory.getWinDriver();
+            context.setWindowsDriver(driver);
 
-        ElementHelper.clearAndFillFieldIfExists(driver, "EdtCode", DEFAULT_USERNAME);
-        ElementHelper.clearAndFillField(driver, "EdtCyp", DEFAULT_PASSWORD);
-        ElementHelper.clearAndFillField(driver, "EdtNum", DEFAULT_COMPANY);
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+            ElementHelper.clearAndFillFieldIfExists(driver, "EdtCode", DEFAULT_USERNAME);
+            ElementHelper.clearAndFillField(driver, "EdtCyp", DEFAULT_PASSWORD);
+            ElementHelper.clearAndFillField(driver, "EdtNum", DEFAULT_COMPANY);
 
-        try {
-            WebElement girisYap = wait.until(ExpectedConditions.elementToBeClickable(
-                    MobileBy.name("Giriş Yap")));
-            girisYap.click();
-            System.out.println("✅ ERP giriş başarılı.");
-        } catch (Exception e) {
-            throw new RuntimeException("❌ ERP girişi sırasında hata oluştu: " + e.getMessage(), e);
-        }
+            try {
+                WebElement girisYap = wait.until(ExpectedConditions.elementToBeClickable(
+                        MobileBy.name("Giriş Yap")));
+                girisYap.click();
+                System.out.println("✅ ERP giriş başarılı.");
+            } catch (Exception e) {
+                throw new RuntimeException("❌ ERP girişi sırasında hata oluştu: " + e.getMessage(), e);
+            }
 
-        // Online Hesap Özeti Uygulamasına geçiş
-        ElementHelper.waitForElement(driver, "name", APP_NAME, 13).click();
-        ElementHelper.waitForWindowByTitle(APP_NAME, 5);
-        ElementHelper.switchToWindowByTitle(APP_NAME);
-
-
-
-// WebView2 ekranı için Selenium WebDriver başlat
-        try {
-            System.out.println("🧭 [Hooks] 'Online Hesap Özeti' ekranı geldi. Selenium geçişi başlatılıyor...");
+            // Online Hesap Özeti Uygulamasını aç
+            ElementHelper.waitForElement(driver, "name", APP_NAME, 13).click();
+            ElementHelper.waitForWindowByTitle(APP_NAME, 5);
+            ElementHelper.switchToWindowByTitle(APP_NAME);
 
             WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
             context.setWebDriver(seleniumDriver);
-Thread.sleep(1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            ElementHelper.maximizeWindowWithRobot("Online Hesap Özeti Uygulaması");
 
-
-
-                ElementHelper.maximizeWindowWithRobot("Online Hesap Özeti Uygulaması");
-
-            // Gerekirse ikinci giriş ekranı için kontrol
             LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(seleniumDriver);
             loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.123456");
 
+            try {
+                Thread.sleep(6000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("✅ Selenium WebDriver aktifleştirildi.");
+            uygulamaZatenBaslatildi = true; // ❗ bir daha çalıştırma
+        } else {
+            System.out.println("⏩ Uygulama zaten açık. Yeni senaryoya geçiliyor.");
+            // ❗ buraya anasayfaya dön komutları eklenebilir
+            context.setWindowsDriver(DriverFactory.getWinDriver());
+            context.setWebDriver(DriverFactory.getSeleniumDriver());
 
-            System.out.println("Sayfanın yüklendiğinden kesin emin olmak için 6 saniye statik bekleme eklendi");
-            Thread.sleep(6000);
-            System.out.println("Statik bekleme sona erdi.");
-
-
-
-            System.out.println("✅ [Hooks] Selenium WebDriver aktifleştirildi. DOM üzerinden testlere geçildi.");
-            System.out.println("🔍 Başlık: " + seleniumDriver.getTitle());
-
-        } catch (Exception e) {
-            System.out.println("❌ [Hooks] Selenium geçişinde hata oluştu.");
-            System.out.println("🔍 Hata mesajı: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("WebView2 geçişi yapılamadı!", e);
+            // Anasayfa'ya dön komutu (örnek):
+            ElementHelper.navigateToHomePage(context.getWebDriver());
         }
-
     }
+
 
     @After
     public void tearDown(Scenario scenario) {
@@ -109,6 +102,9 @@ Thread.sleep(1000);
         } else {
             System.out.println("✅ Test başarıyla tamamlandı.");
         }
-        DriverFactory.quitDriver();
+
+        // ❗ Appium ve ERP sadece en son senaryodan sonra kapatılmalı, burada değil
+        // Örneğin `Runner` sonunda global temizleme yapılabilir.
     }
+
 }

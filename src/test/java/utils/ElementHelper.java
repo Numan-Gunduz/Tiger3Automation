@@ -1,6 +1,7 @@
 
 package utils;
 
+import base.TestContext;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import io.appium.java_client.MobileBy;
@@ -15,6 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import org.openqa.selenium.WebElement;
+import pages.EkstreAktarimiPage;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -216,6 +218,30 @@ public class ElementHelper {
     public static void waitForTextInElement(WebDriver driver, By locator, String expectedText, int timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
         wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, expectedText));
+    }
+
+    public static void navigateToHomePage(WebDriver seleniumDriver) {
+        try {
+            System.out.println("🏠 Ana Sayfa'ya dönülüyor...");
+
+            WebDriverWait wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(15));
+
+            // Ana sayfa menü öğesi gelene kadar bekle
+            WebElement menuItem = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//li[contains(@class,'ant-menu-item') and .//span[text()='Ana Sayfa']]")
+            ));
+
+            ((JavascriptExecutor) seleniumDriver).executeScript("arguments[0].scrollIntoView(true);", menuItem);
+            Thread.sleep(500); // kaydırma sonrası kısa bekleme
+            menuItem.click();
+
+            System.out.println("✅ Ana Sayfa'ya geçiş başarılı.");
+            Thread.sleep(2000); // Sayfa geçiş sonrası stabilite
+
+        } catch (Exception e) {
+            System.out.println("❌ Ana Sayfa'ya geçerken hata oluştu: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 

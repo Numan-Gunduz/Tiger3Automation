@@ -1118,17 +1118,7 @@ public class EkstreAktarimiPage {
             throw new RuntimeException("❌ Üç nokta tıklama desteklenmiyor: " + alan);
         }
     }
-//    public void clickSelectButtonForField(String alan) {
-//        try {
-//            if (alan.toLowerCase().contains("banka")) {
-//                clickSelectButtonOnCariPopupBankaKodu();
-//            } else {
-//                clickSelectButtonOnCariPopup();
-//            }
-//        } catch (AWTException | InterruptedException e) {
-//            throw new RuntimeException("❌ Select butonu tıklanırken hata oluştu: " + e.getMessage(), e);
-//        }
-//    }
+
 public void clickSelectButtonForField(String alan) {
     try {
         if (alan.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
@@ -1387,27 +1377,6 @@ public void clickSelectButtonForField(String alan) {
     }
 
 
-
-//    public String getFisNoFromPopup(String fisTuru) {
-//        try {
-//            WebDriverWait wait = new WebDriverWait(winDriver, Duration.ofSeconds(10));
-//
-//            By locator;
-//            if (fisTuru.equalsIgnoreCase("Hizmet Faturası Fişi")) {
-//                locator = MobileBy.AccessibilityId("ficheNoEdit"); // Hizmet
-//            } else {
-//                locator = MobileBy.AccessibilityId("FicheNoEdit"); // Diğer fişler
-//            }
-//
-//            WebElement fisNoField = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-//            return fisNoField.getText().trim();
-//
-//        } catch (Exception e) {
-//            System.out.println("❌ Fiş no alanı alınamadı: " + e.getMessage());
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     public String getFisNoFromPopup_HizmetFaturasi() {
         try {
             WebDriverWait wait = new WebDriverWait(winDriver, Duration.ofSeconds(10));
@@ -1456,6 +1425,37 @@ public void clickSelectButtonForField(String alan) {
         }
     }
 
+    public boolean checkDurumOnly(String expectedDurum) {
+        try {
+            List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+            int durumIndex = -1;
+
+            for (int i = 0; i < headers.size(); i++) {
+                if (headers.get(i).getText().trim().equalsIgnoreCase("Durum")) {
+                    durumIndex = i + 1;
+                    break;
+                }
+            }
+
+            if (durumIndex == -1) {
+                throw new RuntimeException("❌ 'Durum' sütunu bulunamadı.");
+            }
+
+            WebElement durumCell = selectedRowElement.findElement(By.xpath("./td[" + durumIndex + "]"));
+
+            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+
+            return wait.until(driver -> {
+                String durumText = durumCell.getAttribute("innerText").trim();
+                System.out.println("🔍 (Boş alan tipi) Beklenen Durum: " + expectedDurum + " | Gerçek: " + durumText);
+                return durumText.equalsIgnoreCase(expectedDurum);
+            });
+
+        } catch (Exception e) {
+            System.out.println("❌ checkDurumOnly() hata: " + e.getMessage());
+            return false;
+        }
+    }
 
 
 }

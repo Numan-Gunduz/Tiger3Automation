@@ -265,19 +265,41 @@ public class EkstreAktarimiSteps {
 
     @When("Kullanıcı {string} alanındaki üç noktaya tıklar")
     public void ucNoktaTikla(String alanTipi) {
+        if (alanTipi == null || alanTipi.trim().isEmpty()) {
+            System.out.println("ℹ️ Alan tipi boş, üç nokta adımı atlanıyor.");
+            return;
+        }
         page.clickThreeDotsForField(alanTipi);
     }
 
     @And("Kullanıcı {string} için açılan pencerede seç butonuna tıklar")
     public void secButonunaTikla(String alanTipi) {
+        if (alanTipi == null || alanTipi.trim().isEmpty()) {
+            System.out.println("ℹ️ Alan tipi boş, seç butonu adımı atlanıyor.");
+            return;
+        }
         page.clickSelectButtonForField(alanTipi);
     }
+//
+//    @Then("{string} dolduğunda, Durum sütunu {string} olarak güncellenir")
+//    public void alanDoldugundaDurumKontrol(String alanTipi, String beklenenDurum) {
+//        boolean result = page.checkDurumUpdatedAfterFieldFill(alanTipi, beklenenDurum);
+//        Assert.assertTrue(result, "❌ Alan doldurulduğunda beklenen durum sağlanmadı.");
+//    }
 
     @Then("{string} dolduğunda, Durum sütunu {string} olarak güncellenir")
     public void alanDoldugundaDurumKontrol(String alanTipi, String beklenenDurum) {
-        boolean result = page.checkDurumUpdatedAfterFieldFill(alanTipi, beklenenDurum);
+        boolean result;
+
+        if (alanTipi == null || alanTipi.trim().isEmpty()) {
+            result = page.checkDurumOnly(beklenenDurum); // yeni metot: sadece Durum kontrolü
+        } else {
+            result = page.checkDurumUpdatedAfterFieldFill(alanTipi, beklenenDurum);
+        }
+
         Assert.assertTrue(result, "❌ Alan doldurulduğunda beklenen durum sağlanmadı.");
     }
+
 
     @And("Fiş oluştur butonuna tıklar")
     public void fisOlusturTiklar() {

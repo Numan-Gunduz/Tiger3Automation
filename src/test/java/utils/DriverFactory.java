@@ -188,6 +188,16 @@ public class DriverFactory {
         }
         return winDriver;
     }
+    public static boolean isDebugPortListening(int timeoutSeconds) {
+        long endTime = System.currentTimeMillis() + timeoutSeconds * 1000;
+        while (System.currentTimeMillis() < endTime) {
+            try (Socket socket = new Socket("127.0.0.1", 9222)) {
+                return true;
+            } catch (IOException ignored) {}
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+        }
+        return false;
+    }
 
     public static void quitDriver() {
         if (winDriver != null) {

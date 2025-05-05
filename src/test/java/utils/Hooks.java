@@ -64,8 +64,20 @@ public class Hooks {
             ElementHelper.waitForWindowByTitle(APP_NAME, 5);
             ElementHelper.switchToWindowByTitle(APP_NAME);
 
+
+            if (!DriverFactory.isDebugPortListening(20)) {
+                throw new RuntimeException("❌ WebView2 debug port zaman aşımına uğradı.");
+            }
             WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
+            if (seleniumDriver == null) {
+                throw new RuntimeException("❌ Selenium WebDriver oluşturulamadı. Test iptal ediliyor.");
+            }
             context.setWebDriver(seleniumDriver);
+
+
+//
+//            WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
+//            context.setWebDriver(seleniumDriver);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

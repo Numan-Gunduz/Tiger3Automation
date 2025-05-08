@@ -6,7 +6,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features = "src/test/java/features",
-        glue = {"test"},
+        glue = {"stepDefinitions", "utils"}, // ✅ BURADA OLMALI
         plugin = {
                 "pretty",
                 "html:target/cucumber-reports.html",

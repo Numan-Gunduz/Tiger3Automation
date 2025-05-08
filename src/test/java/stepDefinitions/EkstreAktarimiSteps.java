@@ -357,6 +357,21 @@ public void fisNoDogruMu() {
         page.closeOpenPopupsOneByOne();
     }
 
+    @And("Tutarı negatif ve Durumu {string} olan kaydın checkbox'ını işaretler")
+    public void negatifVeDurumluSatirSec(String durum) {
+        page.selectRowWithNegativeTutarAndDurum(durum);
+    }
+
+
+    @When("Kullanıcı ERP Kasa Kodu alanına göre Kasa İşlemleri'ne gider")
+    public void kasaIslemlerineGider() {
+        page.navigateToKasaIslemleriByErpKodu();
+    }
+
+    @Then("Açılan kayıt Kasa İşlem No ile eşleşmeli ve form ekranı açılmalıdır")
+    public void kasaFormuAcilmali() {
+        Assert.assertTrue(page.verifyKasaFormOpenedWithCorrectFicheNo(), "❌ Bankadan Çekilen formu açılmadı veya işlem no uyuşmuyor.");
+    }
 
 
 }

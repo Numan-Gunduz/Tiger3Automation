@@ -918,6 +918,7 @@
 //
 //
 package pages;
+import io.appium.java_client.AppiumBy;
 
 import base.TestContext;
 import io.appium.java_client.MobileBy;
@@ -1087,8 +1088,8 @@ public class EkstreAktarimiPage {
         clickThreeDotsInField("ERP Banka Hesap Kodu");
     }
 
-    public void clickErpHizmetKodDots() {clickThreeDotsInField("ERP Hizmet Kodu");
-    }
+    public void clickErpHizmetKodDots() {clickThreeDotsInField("ERP Hizmet Kodu");}
+    public void clickErpKasaKodDots() {clickThreeDotsInField("ERP Kasa Kodu");}
 
     private void clickThreeDotsInField(String header) {
         List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
@@ -1113,7 +1114,9 @@ public class EkstreAktarimiPage {
         else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
             clickErpHizmetKodDots();
         }
-
+        else if(alan.equalsIgnoreCase("ERP Kasa Kodu")) {
+            clickErpKasaKodDots();
+        }
         else {
             throw new RuntimeException("❌ Üç nokta tıklama desteklenmiyor: " + alan);
         }
@@ -1127,7 +1130,11 @@ public void clickSelectButtonForField(String alan) {
             clickCheckboxAndThenSelectButtonForHizmet();
         } else if (alan.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
             clickSelectButtonOnCariPopup();
-        } else {
+        }
+        else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
+            clickErpKasaKoduCheckboxAlanı();
+        }
+        else {
             throw new RuntimeException("❌ Select butonu tıklama desteklenmiyor: " + alan);
         }
     } catch (AWTException | InterruptedException e) {
@@ -1146,7 +1153,9 @@ public void clickSelectButtonForField(String alan) {
         else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
             return isDurumKaydedilebilirHizmetKodu();
         }
-
+        else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
+            return isDurumKaydedilebilirKasaKodu();
+        }
         else {
             throw new RuntimeException("❌ Alan tipi desteklenmiyor: " + alan);
         }
@@ -1171,6 +1180,10 @@ public void clickSelectButtonForField(String alan) {
         WebElement selectButton = winDriver.findElement(MobileBy.name("Seç"));
         selectButton.click();
     }
+    public void clickErpKasaKoduCheckboxAlanı() throws InterruptedException {
+        Thread.sleep(2000);
+        winDriver.findElement(MobileBy.AccessibilityId("chooseButton")).click();
+    }
 
     public boolean isDurumKaydedilebilirGorunuyor() {
         return isFieldFilledAndDurum("ERP Cari Hesap Kodu", "Kaydedilebilir");
@@ -1181,6 +1194,9 @@ public void clickSelectButtonForField(String alan) {
     }
     public boolean isDurumKaydedilebilirHizmetKodu() {
         return isFieldFilledAndDurum("ERP Hizmet Kodu", "Kaydedilebilir");
+    }
+    public boolean isDurumKaydedilebilirKasaKodu() {
+        return isFieldFilledAndDurum("ERP Kasa Kodu", "Kaydedilebilir");
     }
 
     private boolean isFieldFilledAndDurum(String header, String expectedDurum) {
@@ -1362,7 +1378,7 @@ public void clickSelectButtonForField(String alan) {
             }
 
             if (fisTuruIndex == -1) {
-                throw new RuntimeException("❌ 'Fiş Türü' sütunu bulunamadı.");
+                throw new RuntimeException(" 'Fiş Türü' sütunu bulunamadı.");
             }
 
             WebElement cell = selectedRowElement.findElement(By.xpath("./td[" + fisTuruIndex + "]"));
@@ -1371,7 +1387,7 @@ public void clickSelectButtonForField(String alan) {
             return text;
 
         } catch (Exception e) {
-            System.out.println("❌ getCurrentFisTuru() hata: " + e.getMessage());
+            System.out.println(" getCurrentFisTuru() hata: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -1396,7 +1412,7 @@ public void clickSelectButtonForField(String alan) {
                     MobileBy.AccessibilityId("FicheNoEdit")));
             return fisNo.getText().trim();
         } catch (Exception e) {
-            System.out.println("❌ Klasik fiş no okunamadı: " + e.getMessage());
+            System.out.println(" Klasik fiş no okunamadı: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -1438,7 +1454,7 @@ public void clickSelectButtonForField(String alan) {
             }
 
             if (durumIndex == -1) {
-                throw new RuntimeException("❌ 'Durum' sütunu bulunamadı.");
+                throw new RuntimeException(" 'Durum' sütunu bulunamadı.");
             }
 
             WebElement durumCell = selectedRowElement.findElement(By.xpath("./td[" + durumIndex + "]"));
@@ -1456,6 +1472,113 @@ public void clickSelectButtonForField(String alan) {
             return false;
         }
     }
+
+    public void selectRowWithNegativeTutarAndDurum(String beklenenDurum) {
+        List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+        List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+
+        int tutarIndex = -1;
+        int durumIndex = -1;
+
+        for (int i = 0; i < headers.size(); i++) {
+            String text = headers.get(i).getText().trim();
+            if (text.equalsIgnoreCase("Tutar")) tutarIndex = i + 1;
+            if (text.equalsIgnoreCase("Durum")) durumIndex = i + 1;
+        }
+
+        if (tutarIndex == -1 || durumIndex == -1)
+            throw new RuntimeException(" 'Tutar' veya 'Durum' sütunu bulunamadı");
+
+        for (WebElement row : rows) {
+            WebElement tutarCell = row.findElement(By.xpath("./td[" + tutarIndex + "]"));
+            WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
+
+            String tutarText = tutarCell.getText().trim().replace(",", "."); // olası formatlar
+            String durumText = durumCell.getText().trim();
+
+            if (tutarText.startsWith("-") && durumText.equalsIgnoreCase(beklenenDurum)) {
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (!checkbox.isSelected()) {
+                    // checkbox devre dışı ise doğrudan tıklamak hata verir, iç span’a tıkla
+                    WebElement span = row.findElement(By.cssSelector(".ant-checkbox-inner"));
+                    ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", span);
+                }
+                selectedRowElement = row;
+                return;
+            }
+        }
+
+        throw new RuntimeException(" Negatif tutarlı ve '" + beklenenDurum + "' durumuna sahip satır bulunamadı.");
+    }
+
+    public void navigateToKasaIslemleriByErpKodu() {
+        try {
+            System.out.println("🔍 ERP Fiş No alınıyor...");
+            String kasaIslemNo = getErpFisNoFromSelectedRow();
+
+            System.out.println("📉 Uygulama ekranı simge durumuna alınıyor...");
+            WebElement minimizeBtn = winDriver.findElement(MobileBy.AccessibilityId("pcMinimize"));
+            minimizeBtn.click();
+            Thread.sleep(2000);
+
+            System.out.println("🖱️ Menü butonuna tıklanıyor...");
+            WebElement menuButton = winDriver.findElement(MobileBy.name("Menü"));
+            menuButton.click();
+            Thread.sleep(1000);
+
+            System.out.println("🔍 Arama kutusu bulunuyor ve 'Kasa' yazılıyor...");
+            WebElement searchBox = winDriver.findElement(By.className("TButtonedEdit"));
+            searchBox.click();
+            searchBox.clear();
+            searchBox.sendKeys("Kasa");
+            Thread.sleep(1000);
+
+            List<WebElement> menuTrees = winDriver.findElements(By.className("TDesktopMenuVSTTree"));
+
+            for (WebElement tree : menuTrees) {
+                List<WebElement> items = tree.findElements(By.xpath(".//*"));
+                System.out.println("🧩 Bulunan alt öğe sayısı: " + items.size());
+
+                int i = 0;
+                for (WebElement item : items) {
+                    try {
+                        String name = item.getAttribute("Name");
+                        String text = item.getText();
+                        System.out.println("🔍[" + i + "] Name: " + name + " | Text: " + text);
+                    } catch (Exception e) {
+                        System.out.println("⚠️[" + i + "] Öğeye erişilemedi: " + e.getMessage());
+                    }
+                    i++;
+                }
+
+                // Örneğin 0. öğe tıklanacaksa:
+                int kasaIndex = 0;
+                if (items.size() > kasaIndex) {
+                    WebElement kasaItem = items.get(kasaIndex);
+                    System.out.println("✅ 'Kasa İşlemleri' olduğu varsayılan öğeye çift tıklanıyor...");
+                    new Actions(winDriver).doubleClick(kasaItem).perform();
+                    return;
+                }
+            }
+            throw new RuntimeException("❌ 'Kasa İşlemleri' menü öğesi tıklanamadı (index erişimi başarısız).");
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean verifyKasaFormOpenedWithCorrectFicheNo() {
+        try {
+            String expectedFicheNo = getErpFisNoFromSelectedRow();
+            WebElement kasaIslemNoField = winDriver.findElement(MobileBy.AccessibilityId("ficheNoEdit"));
+            String openedFicheNo = kasaIslemNoField.getText().trim();
+            return expectedFicheNo.equals(openedFicheNo);
+        } catch (Exception e) {
+            System.out.println("⚠️ Kasa işlem ekranı doğrulanamadı: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 
 }

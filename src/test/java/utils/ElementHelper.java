@@ -319,7 +319,7 @@ public class ElementHelper {
         }, null);
 
         if (foundWindow[0] == null) {
-            throw new RuntimeException("❌ Pencere bulunamadı: " + partialTitle);
+            throw new RuntimeException(" Pencere bulunamadı: " + partialTitle);
         }
 
         // Maximize (3 = SW_MAXIMIZE)
@@ -327,7 +327,7 @@ public class ElementHelper {
 
         boolean foregroundResult = User32.INSTANCE.SetForegroundWindow(foundWindow[0]);
         if (!foregroundResult) {
-            throw new RuntimeException("⚠️ SetForegroundWindow başarısız! Pencere ön plana alınamadı: " + partialTitle);
+            throw new RuntimeException(" SetForegroundWindow başarısız! Pencere ön plana alınamadı: " + partialTitle);
         }
 
         try {
@@ -345,9 +345,9 @@ public class ElementHelper {
             robot.keyPress(KeyEvent.VK_X);
             robot.keyRelease(KeyEvent.VK_X);
 
-            System.out.println("✅ Robot ile pencere maximize komutu gönderildi.");
+            System.out.println(" Robot ile pencere maximize komutu gönderildi.");
         } catch (Exception e) {
-            throw new RuntimeException("❌ Maximize işlemi başarısız!", e);
+            throw new RuntimeException(" Maximize işlemi başarısız!", e);
         }
     }
 

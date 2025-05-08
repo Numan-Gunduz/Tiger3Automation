@@ -25,8 +25,5 @@ public class TestContext {
         this.webDriver = webDriver;
     }
 
-    public Object getActiveDriver() {
-        if (webDriver != null) return webDriver;
-        return windowsDriver;
-    }
+
 }

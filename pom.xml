@@ -65,14 +65,14 @@
         </dependency>
 
 
-        <!-- ✅ Appium (WinAppDriver) -->
+        <!--  Appium (WinAppDriver) -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
             <version>8.5.0</version>
         </dependency>
 
-        <!-- ✅ Selenium 4 (Debug port bağlantısı için) -->
+        <!--  Selenium 4 (Debug port bağlantısı için) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-remote-driver</artifactId>
@@ -91,7 +91,7 @@
         </dependency>
 
 
-        <!-- ✅ Cucumber -->
+        <!--  Cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
@@ -109,14 +109,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ✅ TestNG -->
+        <!--  TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>7.10.2</version>
         </dependency>
 
-        <!-- ✅ JUnit -->
+        <!--  JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -125,8 +125,7 @@
         </dependency>
 
 
-
-        <!-- ✅ JNA (pencere handle) -->
+        <!--  JNA (pencere handlre) -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
@@ -138,7 +137,7 @@
             <version>5.13.0</version>
         </dependency>
 
-        <!-- ✅ JSON Parser -->
+        <!--  JSON Parser -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -150,14 +149,14 @@
             <version>2.17.0</version>
         </dependency>
 
-        <!-- ✅ WebDriverManager -->
+        <!--  WebDriverManager -->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>5.3.2</version>
         </dependency>
 
-        <!-- ✅ Logging -->
+        <!--  Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>

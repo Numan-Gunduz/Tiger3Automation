@@ -34,7 +34,7 @@ public class Hooks {
     @Before
     public void setUp(Scenario scenario) {
         LogSilencer.silenceSeleniumWarnings();
-        System.out.println("🚀 Test başlatılıyor: " + scenario.getName());
+        System.out.println(" Test başlatılıyor: " + scenario.getName());
 
         if (!uygulamaZatenBaslatildi) {
             System.out.println("🔄 Uygulama ilk kez başlatılıyor...");
@@ -66,11 +66,11 @@ public class Hooks {
 
 
             if (!DriverFactory.isDebugPortListening(20)) {
-                throw new RuntimeException("❌ WebView2 debug port zaman aşımına uğradı.");
+                throw new RuntimeException(" WebView2 debug port zaman aşımına uğradı.");
             }
             WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
             if (seleniumDriver == null) {
-                throw new RuntimeException("❌ Selenium WebDriver oluşturulamadı. Test iptal ediliyor.");
+                throw new RuntimeException(" Selenium WebDriver oluşturulamadı. Test iptal ediliyor.");
             }
             context.setWebDriver(seleniumDriver);
 
@@ -94,7 +94,7 @@ public class Hooks {
                 throw new RuntimeException(e);
             }
             System.out.println("✅ Selenium WebDriver aktifleştirildi.");
-            uygulamaZatenBaslatildi = true; // ❗ bir daha çalıştırma
+            uygulamaZatenBaslatildi = true; // bir daha çalıştırma
         } else {
             System.out.println("⏩ Uygulama zaten açık. Yeni senaryoya geçiliyor.");
             // ❗ buraya anasayfaya dön komutları eklenebilir
@@ -110,9 +110,9 @@ public class Hooks {
     @After
     public void tearDown(Scenario scenario) {
         if (scenario.isFailed()) {
-            System.out.println("❌ Test başarısız oldu: " + scenario.getName());
+            System.out.println(" Test başarısız oldu: " + scenario.getName());
         } else {
-            System.out.println("✅ Test başarıyla tamamlandı.");
+            System.out.println(" Test başarıyla tamamlandı.");
         }
 
         // ❗ Appium ve ERP sadece en son senaryodan sonra kapatılmalı, burada değil

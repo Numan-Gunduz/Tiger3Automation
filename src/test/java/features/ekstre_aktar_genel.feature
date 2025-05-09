@@ -42,7 +42,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Ziraat Bankası" seçer
     And Hesap dropdown'undan "TR0300**5013 - ZİRAAT" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 16 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 17 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer
@@ -57,5 +57,6 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     Then Durum alanı Eşlendi olarak güncellenmelidir
     Then ERP Fiş No alanı dolu olmalıdır
     When Kullanıcı ERP Kasa Kodu alanına göre Kasa İşlemleri'ne gider
+    When Kasa İşlemleri ekranında ERP Fiş No satırına çift tıklar
     Then Açılan kayıt Kasa İşlem No ile eşleşmeli ve form ekranı açılmalıdır
     And Açılan popup pencereleri kapatır

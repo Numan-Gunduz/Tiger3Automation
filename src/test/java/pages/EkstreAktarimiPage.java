@@ -919,7 +919,14 @@
 //
 package pages;
 import io.appium.java_client.AppiumBy;
+import com.sun.jna.platform.win32.COM.util.annotation.ComObject;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 
+import java.awt.event.InputEvent;
+import java.lang.reflect.Field;
 import base.TestContext;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
@@ -1511,73 +1518,119 @@ public void clickSelectButtonForField(String alan) {
         throw new RuntimeException(" Negatif tutarlı ve '" + beklenenDurum + "' durumuna sahip satır bulunamadı.");
     }
 
-    public void navigateToKasaIslemleriByErpKodu() {
-        try {
-            System.out.println("🔍 ERP Fiş No alınıyor...");
-            String kasaIslemNo = getErpFisNoFromSelectedRow();
 
+
+    public void navigateToKasaIslemleriFromGlobalSearch() {
+        try {
             System.out.println("📉 Uygulama ekranı simge durumuna alınıyor...");
             WebElement minimizeBtn = winDriver.findElement(MobileBy.AccessibilityId("pcMinimize"));
             minimizeBtn.click();
+            Thread.sleep(1000);
+
+            System.out.println("🔍 Genel arama alanı bulunuyor ve 'Kasa İşlemleri' yazılıyor...");
+            WebElement globalSearch = winDriver.findElement(By.className("TcxCustomInnerTextEdit"));
+            globalSearch.click();
+            globalSearch.clear();
+            globalSearch.sendKeys("Kasa İşlemleri");
+            Thread.sleep(1500);
+
+            System.out.println("📋 Uygulama listesinde 'Kasa İşlemleri' öğesi bulunuyor...");
+            WebElement kasaIslemleri = winDriver.findElement(MobileBy.name("Kasa İşlemleri"));
+            kasaIslemleri.click();
+            Thread.sleep(200);
+            kasaIslemleri.sendKeys(Keys.ENTER);
             Thread.sleep(2000);
 
-            System.out.println("🖱️ Menü butonuna tıklanıyor...");
-            WebElement menuButton = winDriver.findElement(MobileBy.name("Menü"));
-            menuButton.click();
+            System.out.println("✅ 'Kasa İşlemleri' uygulaması başarıyla açıldı.");
+            System.out.println("📌 LDataGrid tablo koordinatına sağ tıklanıyor...");
+
+            WebElement grid = winDriver.findElement(By.name("CashCardDataGrid"));
+            Point location = grid.getLocation();
+            int x = location.getX() + 50;
+            int y = location.getY() + 50;
+
+            Robot robot = new Robot();
+            robot.mouseMove(x, y);
+            Thread.sleep(500);
+            robot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+            System.out.println("🖱️ Sağ tıklama yapıldı.");
             Thread.sleep(1000);
 
-            System.out.println("🔍 Arama kutusu bulunuyor ve 'Kasa' yazılıyor...");
-            WebElement searchBox = winDriver.findElement(By.className("TButtonedEdit"));
-            searchBox.click();
-            searchBox.clear();
-            searchBox.sendKeys("Kasa");
-            Thread.sleep(1000);
+            // ⬇️ Menüde "İşlemler" öğesinin konumuna tıklama
+            robot.mouseMove(x + 20, y + 5); // "İşlemler" öğesi üstte yer alır
+            Thread.sleep(300);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            System.out.println("✅ 'İşlemler' menü öğesi tıklandı.");
 
-            List<WebElement> menuTrees = winDriver.findElements(By.className("TDesktopMenuVSTTree"));
-
-            for (WebElement tree : menuTrees) {
-                List<WebElement> items = tree.findElements(By.xpath(".//*"));
-                System.out.println("🧩 Bulunan alt öğe sayısı: " + items.size());
-
-                int i = 0;
-                for (WebElement item : items) {
-                    try {
-                        String name = item.getAttribute("Name");
-                        String text = item.getText();
-                        System.out.println("🔍[" + i + "] Name: " + name + " | Text: " + text);
-                    } catch (Exception e) {
-                        System.out.println("⚠️[" + i + "] Öğeye erişilemedi: " + e.getMessage());
-                    }
-                    i++;
-                }
-
-                // Örneğin 0. öğe tıklanacaksa:
-                int kasaIndex = 0;
-                if (items.size() > kasaIndex) {
-                    WebElement kasaItem = items.get(kasaIndex);
-                    System.out.println("✅ 'Kasa İşlemleri' olduğu varsayılan öğeye çift tıklanıyor...");
-                    new Actions(winDriver).doubleClick(kasaItem).perform();
-                    return;
-                }
-            }
-            throw new RuntimeException("❌ 'Kasa İşlemleri' menü öğesi tıklanamadı (index erişimi başarısız).");
-
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Genel işlem başarısız: " + e.getMessage());
         }
     }
+
+
+
+
+    public void openKasaFormByFicheNo() {
+        try {
+            String expectedFicheNo = getErpFisNoFromSelectedRow();
+            System.out.println("\uD83D\uDD0D Beklenen Fiş No (tam): " + expectedFicheNo);
+
+            WebElement grid = winDriver.findElement(By.name("CashTransGrid"));
+            List<WebElement> rows = grid.findElements(By.xpath(".//*"));
+
+            for (WebElement row : rows) {
+                try {
+                    String text = row.getText().trim();
+                    String normalizedText = text.replaceAll("^0+", "");
+                    String normalizedExpected = expectedFicheNo.replaceAll("^0+", "");
+
+                    System.out.println("\uD83D\uDD0D Satır metni: " + text);
+
+                    if (normalizedText.equals(normalizedExpected)) {
+                        System.out.println("✅ Satır bulundu, tıklanıyor...");
+                        row.click();
+                        Thread.sleep(1000);
+
+                        WebElement viewBtn = winDriver.findElement(MobileBy.AccessibilityId("ViewBtn"));
+                        System.out.println("\uD83D\uDD0D 'İncele' butonu tıklanıyor...");
+                        viewBtn.click();
+                        Thread.sleep(2000);
+                        return;
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("⚠️ Satır erişim hatası: " + e.getMessage());
+                }
+            }
+            throw new RuntimeException("❌ Fiş No içeren satır bulunamadı: " + expectedFicheNo);
+
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Form açma başarısız: " + e.getMessage());
+        }
+
+    }
+
+
+
+
 
     public boolean verifyKasaFormOpenedWithCorrectFicheNo() {
         try {
             String expectedFicheNo = getErpFisNoFromSelectedRow();
             WebElement kasaIslemNoField = winDriver.findElement(MobileBy.AccessibilityId("ficheNoEdit"));
             String openedFicheNo = kasaIslemNoField.getText().trim();
+
+            System.out.println("🔍 Beklenen: " + expectedFicheNo + " | Açılan: " + openedFicheNo);
             return expectedFicheNo.equals(openedFicheNo);
+
         } catch (Exception e) {
             System.out.println("⚠️ Kasa işlem ekranı doğrulanamadı: " + e.getMessage());
             return false;
         }
     }
+
 
 
 

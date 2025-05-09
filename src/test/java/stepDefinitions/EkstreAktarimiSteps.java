@@ -365,13 +365,18 @@ public void fisNoDogruMu() {
 
     @When("Kullanıcı ERP Kasa Kodu alanına göre Kasa İşlemleri'ne gider")
     public void kasaIslemlerineGider() {
-        page.navigateToKasaIslemleriByErpKodu();
+        page.navigateToKasaIslemleriFromGlobalSearch();
     }
-
+    @When("Kasa İşlemleri ekranında ERP Fiş No satırına çift tıklar")
+    public void erpFisNoSatirinaCiftTiklar() {
+        page.openKasaFormByFicheNo();
+    }
     @Then("Açılan kayıt Kasa İşlem No ile eşleşmeli ve form ekranı açılmalıdır")
     public void kasaFormuAcilmali() {
-        Assert.assertTrue(page.verifyKasaFormOpenedWithCorrectFicheNo(), "❌ Bankadan Çekilen formu açılmadı veya işlem no uyuşmuyor.");
+        Assert.assertTrue(page.verifyKasaFormOpenedWithCorrectFicheNo(),
+                "❌ Bankadan Çekilen formu açılmadı veya işlem no uyuşmuyor.");
     }
+
 
 
 }

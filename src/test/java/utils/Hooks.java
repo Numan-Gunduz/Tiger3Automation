@@ -89,7 +89,7 @@ public class Hooks {
             loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.123456");
 
             try {
-                Thread.sleep(20000);
+                Thread.sleep(6000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

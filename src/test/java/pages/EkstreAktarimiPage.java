@@ -920,6 +920,7 @@
 package pages;
 import io.appium.java_client.AppiumBy;
 import com.sun.jna.platform.win32.COM.util.annotation.ComObject;
+import org.junit.Assert;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
@@ -962,24 +963,88 @@ public class EkstreAktarimiPage {
     }
 
     public void selectBank(String bank) {
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
+
+        // 1. Dropdown'u aç
         WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@id='select_container']//div[@class='ant-select-selector']")));
+                By.xpath("//div[@id='select_container']//div[contains(@class, 'ant-select-selector')]")));
         dropdown.click();
 
-        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@class='ant-select-item-option-content' and text()='" + bank + "']")));
-        option.click();
+        // 2. "Veri Yok" varsa bekle ama genelde buna gerek kalmayabilir
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.xpath("//div[contains(text(), 'Veri Yok')]")));
+        } catch (TimeoutException ignored) {}
+
+        // 3. İlgili bankayı bul
+        WebElement option = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//div[contains(@class,'ant-select-item-option-content') and normalize-space(text())='" + bank + "']")));
+
+        // 4. JS ile tıkla
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", option);
+
+        // 🔁 5. Dropdowndan sonra seçim alanı güncellendi mi? (retry loop ile sağlamlaştır)
+        boolean success = false;
+        for (int i = 0; i < 5; i++) {
+            try {
+                WebElement selected = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("span.ant-select-selection-item")));
+                if (selected.getText().trim().equals(bank)) {
+                    success = true;
+                    break;
+                }
+            } catch (Exception ignored) {}
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (!success) {
+            throw new RuntimeException("❌ Dropdown seçimi başarısız: " + bank);
+        }
+
+        System.out.println("✅ '" + bank + "' bankası başarıyla seçildi.");
     }
 
-    public void selectAccount(String iban) {
-        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("(//div[contains(@class,'ant-select-selector')])[2]")));
-        dropdown.click();
 
-        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@class='ant-select-item-option-content' and text()='" + iban + "']")));
-        option.click();
+
+
+    public String getCurrentlySelectedBank() {
+        WebElement selected = webDriver.findElement(By.xpath("(//span[@class='ant-select-selection-item'])[1]"));
+        return selected.getText().trim();
     }
+
+
+    public void selectAccount(String iban, String expectedBank) {
+        try {
+            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
+
+            WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("(//div[contains(@class,'ant-select-selector')])[2]")));
+            dropdown.click();
+
+            WebElement option = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//div[@class='ant-select-item-option-content' and normalize-space(text())='" + iban + "']")));
+
+            ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", option);
+            System.out.println("✅ '" + iban + "' hesabı başarıyla seçildi.");
+
+            WebElement selectedBank = webDriver.findElement(By.xpath("(//span[@class='ant-select-selection-item'])[1]"));
+            String currentBank = selectedBank.getText().trim();
+
+            if (!currentBank.equals(expectedBank)) {
+                System.out.println("⚠️ Hesap seçimi sonrası banka resetlendi. '" + expectedBank + "' tekrar seçiliyor.");
+                selectBank(expectedBank);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Hesap seçimi başarısız: " + e.getMessage());
+        }
+    }
+
+
 
     public void enterStartDateDaysAgo(int daysAgo) {
         String dateStr = LocalDate.now().minusDays(daysAgo).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -1070,8 +1135,6 @@ public class EkstreAktarimiPage {
     }
 
 
-
-
     public boolean validateDurumForEmptyField(String fieldHeader, String expectedDurumText) {
         List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
         int fieldIndex = -1, durumIndex = -1;
@@ -1095,8 +1158,13 @@ public class EkstreAktarimiPage {
         clickThreeDotsInField("ERP Banka Hesap Kodu");
     }
 
-    public void clickErpHizmetKodDots() {clickThreeDotsInField("ERP Hizmet Kodu");}
-    public void clickErpKasaKodDots() {clickThreeDotsInField("ERP Kasa Kodu");}
+    public void clickErpHizmetKodDots() {
+        clickThreeDotsInField("ERP Hizmet Kodu");
+    }
+
+    public void clickErpKasaKodDots() {
+        clickThreeDotsInField("ERP Kasa Kodu");
+    }
 
     private void clickThreeDotsInField(String header) {
         List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
@@ -1112,43 +1180,38 @@ public class EkstreAktarimiPage {
         WebElement host = cell.findElement(By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']"));
         ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", host);
     }
+
     public void clickThreeDotsForField(String alan) {
         if (alan.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
             clickErpCariKodDots();
         } else if (alan.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
             clickErpBankaKodDots();
-        }
-        else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
+        } else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
             clickErpHizmetKodDots();
-        }
-        else if(alan.equalsIgnoreCase("ERP Kasa Kodu")) {
+        } else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
             clickErpKasaKodDots();
-        }
-        else {
+        } else {
             throw new RuntimeException("❌ Üç nokta tıklama desteklenmiyor: " + alan);
         }
     }
 
-public void clickSelectButtonForField(String alan) {
-    try {
-        if (alan.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
-            clickSelectButtonOnCariPopupBankaKodu();
-        } else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
-            clickCheckboxAndThenSelectButtonForHizmet();
-        } else if (alan.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
-            clickSelectButtonOnCariPopup();
+    public void clickSelectButtonForField(String alan) {
+        try {
+            if (alan.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
+                clickSelectButtonOnCariPopupBankaKodu();
+            } else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
+                clickCheckboxAndThenSelectButtonForHizmet();
+            } else if (alan.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
+                clickSelectButtonOnCariPopup();
+            } else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
+                clickErpKasaKoduCheckboxAlanı();
+            } else {
+                throw new RuntimeException("❌ Select butonu tıklama desteklenmiyor: " + alan);
+            }
+        } catch (AWTException | InterruptedException e) {
+            throw new RuntimeException("❌ Select butonu tıklanırken hata oluştu: " + e.getMessage(), e);
         }
-        else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
-            clickErpKasaKoduCheckboxAlanı();
-        }
-        else {
-            throw new RuntimeException("❌ Select butonu tıklama desteklenmiyor: " + alan);
-        }
-    } catch (AWTException | InterruptedException e) {
-        throw new RuntimeException("❌ Select butonu tıklanırken hata oluştu: " + e.getMessage(), e);
     }
-}
-
 
 
     public boolean checkDurumUpdatedAfterFieldFill(String alan, String expectedDurum) {
@@ -1156,17 +1219,15 @@ public void clickSelectButtonForField(String alan) {
             return isDurumKaydedilebilirGorunuyor();
         } else if (alan.equalsIgnoreCase("ERP Banka Hesap Kodu")) {
             return isDurumKaydedilebilirBankaKod();
-        }
-        else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
+        } else if (alan.equalsIgnoreCase("ERP Hizmet Kodu")) {
             return isDurumKaydedilebilirHizmetKodu();
-        }
-        else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
+        } else if (alan.equalsIgnoreCase("ERP Kasa Kodu")) {
             return isDurumKaydedilebilirKasaKodu();
-        }
-        else {
+        } else {
             throw new RuntimeException("❌ Alan tipi desteklenmiyor: " + alan);
         }
     }
+
     public void clickSelectButtonOnCariPopup() throws AWTException, InterruptedException {
         Thread.sleep(3000);
         Robot robot = new Robot();
@@ -1179,6 +1240,7 @@ public void clickSelectButtonForField(String alan) {
         Thread.sleep(2000);
         winDriver.findElement(MobileBy.AccessibilityId("SelBtn")).click();
     }
+
     public void clickCheckboxAndThenSelectButtonForHizmet() throws InterruptedException {
         Thread.sleep(2000); // pencere tam açılsın
         WebElement checkbox = winDriver.findElement(MobileBy.name("Seçim row0"));
@@ -1187,6 +1249,7 @@ public void clickSelectButtonForField(String alan) {
         WebElement selectButton = winDriver.findElement(MobileBy.name("Seç"));
         selectButton.click();
     }
+
     public void clickErpKasaKoduCheckboxAlanı() throws InterruptedException {
         Thread.sleep(2000);
         winDriver.findElement(MobileBy.AccessibilityId("chooseButton")).click();
@@ -1199,9 +1262,11 @@ public void clickSelectButtonForField(String alan) {
     public boolean isDurumKaydedilebilirBankaKod() {
         return isFieldFilledAndDurum("ERP Banka Hesap Kodu", "Kaydedilebilir");
     }
+
     public boolean isDurumKaydedilebilirHizmetKodu() {
         return isFieldFilledAndDurum("ERP Hizmet Kodu", "Kaydedilebilir");
     }
+
     public boolean isDurumKaydedilebilirKasaKodu() {
         return isFieldFilledAndDurum("ERP Kasa Kodu", "Kaydedilebilir");
     }
@@ -1372,6 +1437,7 @@ public void clickSelectButtonForField(String alan) {
             throw new RuntimeException(e);
         }
     }
+
     public String getCurrentFisTuru() {
         try {
             List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
@@ -1425,25 +1491,24 @@ public void clickSelectButtonForField(String alan) {
     }
 
 
-
     public void closeOpenPopupsOneByOne() {
         try {
-            System.out.println("🧹 Açık popup pencereleri kapatılıyor...");
+            System.out.println(" Açık popup pencereleri kapatılıyor...");
 
             // İlk pencereyi kapat
             WebElement closeBtn1 = winDriver.findElement(MobileBy.AccessibilityId("CloseBtn"));
             closeBtn1.click();
-            System.out.println("✅ İlk popup kapatıldı.");
+            System.out.println("İlk popup kapatıldı.");
 
             Thread.sleep(1500); // bekle, ikinci pencerenin ön plana geçmesini sağla
 
             // İkinci pencereyi kapat
             WebElement closeBtn2 = winDriver.findElement(MobileBy.AccessibilityId("CloseBtn"));
             closeBtn2.click();
-            System.out.println("✅ İkinci popup kapatıldı.");
+            System.out.println(" İkinci popup kapatıldı.");
 
         } catch (Exception e) {
-            System.out.println("❌ Popup kapatılırken hata oluştu: " + e.getMessage());
+            System.out.println(" Popup kapatılırken hata oluştu: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -1519,7 +1584,6 @@ public void clickSelectButtonForField(String alan) {
     }
 
 
-
     public void navigateToKasaIslemleriFromGlobalSearch() {
         try {
             System.out.println("📉 Uygulama ekranı simge durumuna alınıyor...");
@@ -1570,8 +1634,6 @@ public void clickSelectButtonForField(String alan) {
     }
 
 
-
-
     public void openKasaFormByFicheNo() {
         try {
             String expectedFicheNo = getErpFisNoFromSelectedRow();
@@ -1613,7 +1675,15 @@ public void clickSelectButtonForField(String alan) {
     }
 
 
-
+    public boolean isBankadanCekilenFormAcildi() {
+        try {
+            WebElement titleBar = winDriver.findElement(By.xpath("//*[contains(@Name, 'Bankadan Çekilen')]"));
+            return titleBar != null && titleBar.isDisplayed();
+        } catch (Exception e) {
+            System.out.println("❌ Bankadan Çekilen formu bulunamadı: " + e.getMessage());
+            return false;
+        }
+    }
 
 
     public boolean verifyKasaFormOpenedWithCorrectFicheNo() {
@@ -1630,8 +1700,6 @@ public void clickSelectButtonForField(String alan) {
             return false;
         }
     }
-
-
 
 
 }

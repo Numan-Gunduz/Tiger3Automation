@@ -27,13 +27,13 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
 
 
   Examples:
-  | Menü            | Banka          | IBAN                              | TarihGeriGun   | ListeleButonu | Durum1               | Durum2         | MenuText           | FisTuru                   | AlanTipi                   | DurumKontrol           | DurumSon       | PopupSecenek   |
+  | Menü            | Banka          | IBAN                    | TarihGeriGun   | ListeleButonu | Durum1                | Durum2         | MenuText           | FisTuru                   | AlanTipi                   | DurumKontrol           | DurumSon       | PopupSecenek   |
 
 
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT        | 19            | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Banka İşlem Fişi          |                            | Kaydedilebilir         | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT        | 19            | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Hizmet Faturası Fişi      | ERP Hizmet Kodu            | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT        | 19            | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Virman Fişi               | ERP Banka Hesap Kodu       | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT        | 19            | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Havale/EFT Fişi           | ERP Cari Hesap Kodu        | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 19             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Banka İşlem Fişi          |                            | Kaydedilebilir         | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 19             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Hizmet Faturası Fişi      | ERP Hizmet Kodu            | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 19             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Virman Fişi               | ERP Banka Hesap Kodu       | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 19             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Havale/EFT Fişi           | ERP Cari Hesap Kodu        | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
 
   @negatifTutarTesti
   Scenario: Tutarı negatif olan Kasa İşlem Fişi kaydının seçilmesi ve fiş oluşturulması

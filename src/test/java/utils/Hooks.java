@@ -1,4 +1,3 @@
-// ✅ Hooks.java
 package utils;
 
 import base.TestContext;
@@ -37,7 +36,7 @@ public class Hooks {
         System.out.println(" Test başlatılıyor: " + scenario.getName());
 
         if (!uygulamaZatenBaslatildi) {
-            System.out.println("🔄 Uygulama ilk kez başlatılıyor...");
+            System.out.println("Uygulama ilk kez başlatılıyor...");
 
             DriverFactory.startAppiumServer();
             DriverFactory.startERPApplication();
@@ -54,9 +53,9 @@ public class Hooks {
                 WebElement girisYap = wait.until(ExpectedConditions.elementToBeClickable(
                         MobileBy.name("Giriş Yap")));
                 girisYap.click();
-                System.out.println("✅ ERP giriş başarılı.");
+                System.out.println(" ERP giriş başarılı.");
             } catch (Exception e) {
-                throw new RuntimeException("❌ ERP girişi sırasında hata oluştu: " + e.getMessage(), e);
+                throw new RuntimeException(" ERP girişi sırasında hata oluştu: " + e.getMessage(), e);
             }
 
             // Online Hesap Özeti Uygulamasını aç
@@ -74,10 +73,6 @@ public class Hooks {
             }
             context.setWebDriver(seleniumDriver);
 
-
-//
-//            WebDriver seleniumDriver = DriverFactory.getSeleniumDriver();
-//            context.setWebDriver(seleniumDriver);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -93,15 +88,14 @@ public class Hooks {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("✅ Selenium WebDriver aktifleştirildi.");
+            System.out.println("Selenium WebDriver aktifleştirildi.");
             uygulamaZatenBaslatildi = true; // bir daha çalıştırma
         } else {
-            System.out.println("⏩ Uygulama zaten açık. Yeni senaryoya geçiliyor.");
-            // ❗ buraya anasayfaya dön komutları eklenebilir
+            System.out.println("Uygulama zaten açık. Yeni senaryoya geçiliyor.");
+            //  buraya anasayfaya dön komutları eklenebilir
             context.setWindowsDriver(DriverFactory.getWinDriver());
             context.setWebDriver(DriverFactory.getSeleniumDriver());
-
-            // Anasayfa'ya dön komutu (örnek):
+            // Anasayfa'ya dön komutu
             ElementHelper.navigateToHomePage(context.getWebDriver());
         }
     }
@@ -115,8 +109,6 @@ public class Hooks {
             System.out.println(" Test başarıyla tamamlandı.");
         }
 
-        // ❗ Appium ve ERP sadece en son senaryodan sonra kapatılmalı, burada değil
-        // Örneğin `Runner` sonunda global temizleme yapılabilir.
     }
 
 }

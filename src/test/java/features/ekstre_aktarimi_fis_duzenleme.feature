@@ -1,4 +1,5 @@
 #Feature: Ekstre Aktarımı Senaryosu
+
 #
 #  Scenario: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydedilebilir hale getirir
 #    Given Kullanıcı sisteme başarılı şekilde giriş yapmış ve ana sayfa tamamen yüklenmiştir

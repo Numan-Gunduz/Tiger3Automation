@@ -25,13 +25,13 @@ public class DriverFactory {
 
     public static void startERPApplication() {
         try {
-            System.out.println("🚀 ERP uygulaması başlatılıyor...");
+            System.out.println("ERP uygulaması başlatılıyor...");
             String command = "Start-Process \"C:\\Tiger\\Protset\\Tiger3Enterprise.exe\" -Verb runAs";
             erpProcess = new ProcessBuilder("powershell.exe", "-Command", command).start();
             waitForTopLevelWindow("TIGER 3 ENTERPRISE 2025.LTS1 / v2.99.00.00 (LOGO YAZILIM (MERKEZ))", 30);
-            System.out.println("✅ ERP uygulaması başlatıldı.");
+            System.out.println("ERP uygulaması başlatıldı.");
         } catch (Exception e) {
-            throw new RuntimeException("❌ ERP başlatılamadı: " + e.getMessage(), e);
+            throw new RuntimeException("ERP başlatılamadı: " + e.getMessage(), e);
         }
     }
     public static void waitForTopLevelWindow(String expectedTitle, int timeoutSeconds) {
@@ -61,86 +61,36 @@ public class DriverFactory {
             }
         }
 
-        throw new RuntimeException("❌ ERP top-level pencere zaman aşımına uğradı: " + expectedTitle);
+        throw new RuntimeException(" ERP top-level pencere zaman aşımına uğradı: " + expectedTitle);
     }
 
     public static void startAppiumServer() {
         try {
-            System.out.println("🚀 Appium Server başlatılıyor...");
+            System.out.println("Appium Server başlatılıyor...");
             ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "start cmd.exe /k appium");
             builder.redirectErrorStream(true);
             appiumProcess = builder.start();
             Thread.sleep(4000);
-            System.out.println("✅ Appium Server başlatıldı.");
+            System.out.println("Appium Server başlatıldı.");
         } catch (Exception e) {
-            throw new RuntimeException("❌ Appium Server başlatılamadı: " + e.getMessage(), e);
+            throw new RuntimeException("Appium Server başlatılamadı: " + e.getMessage(), e);
         }
     }
-    public static WindowsDriver switchToPopupWindowByTitle(String expectedTitle, int timeoutSeconds) {
-        try {
-            System.out.println("🔍 Yeni popup bekleniyor: " + expectedTitle);
-            long end = System.currentTimeMillis() + timeoutSeconds * 1000;
-
-            while (System.currentTimeMillis() < end) {
-                AtomicReference<WinDef.HWND> hwndRef = new AtomicReference<>();
-
-                User32.INSTANCE.EnumWindows((hwnd, data) -> {
-                    char[] buffer = new char[512];
-                    User32.INSTANCE.GetWindowTextW(hwnd, buffer, 512);
-                    String windowTitle = Native.toString(buffer);
-
-                    if (windowTitle != null && !windowTitle.trim().isEmpty()) {
-                        if (windowTitle.contains(expectedTitle)) {
-                            hwndRef.set(hwnd);
-                            return false; // Buldum, dur
-                        }
-                    }
-                    return true; // Devam et
-                }, null);
-
-                if (hwndRef.get() != null) {
-                    Pointer hwndPointer = hwndRef.get().getPointer();
-                    long hwndLong = Pointer.nativeValue(hwndPointer);
-                    String hexHandle = String.format("0x%X", hwndLong);
-
-                    System.out.println("🪟 Yeni pencere bulundu. Handle: " + hexHandle);
-
-                    // Şimdi yeni bir session başlat
-                    DesiredCapabilities caps = new DesiredCapabilities();
-                    caps.setCapability("appTopLevelWindow", hexHandle);
-                    caps.setCapability("platformName", "Windows");
-                    caps.setCapability("deviceName", "WindowsPC");
-
-                    return new WindowsDriver(new URL("http://127.0.0.1:4723"), caps);
-                }
-
-                Thread.sleep(500);
-            }
-
-            throw new RuntimeException("❌ Timeout: Popup pencere bulunamadı: " + expectedTitle);
-        } catch (Exception e) {
-            throw new RuntimeException("❌ Yeni popup'a geçerken hata: " + e.getMessage(), e);
-        }
-    }
-
-
-
-
 
     public static WebDriver getSeleniumDriver() {
         if (seleniumDriver == null) {
             try {
-                System.out.println("🌐 [Selenium] WebView2 debug bağlantısı deneniyor...");
+                System.out.println("[Selenium] WebView2 debug bağlantısı deneniyor...");
 
                 EdgeOptions options = new EdgeOptions();
                 options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222");
 
                 seleniumDriver = new EdgeDriver(options);
 
-                System.out.println("✅ [Selenium] WebView2 bağlantısı başarılı!");
+                System.out.println(" [Selenium] WebView2 bağlantısı başarılı!");
             } catch (Exception e) {
-                System.out.println("⚠️ WebView2 bağlantısı sırasında uyarı: " + e.getMessage());
-                System.out.println("ℹ️ Ancak test devam ediyor, çünkü WebDriver gerekli değil veya zaten bağlandı.");
+                System.out.println(" WebView2 bağlantısı sırasında uyarı: " + e.getMessage());
+                System.out.println("Ancak test devam ediyor, çünkü WebDriver gerekli değil veya zaten bağlandı.");
             }
         }
         return seleniumDriver;
@@ -165,7 +115,7 @@ public class DriverFactory {
                 }, null);
 
                 if (hwndRef.get() == null) {
-                    throw new RuntimeException("❌ ERP top-level pencere bulunamadı.");
+                    throw new RuntimeException("ERP top-level pencere bulunamadı.");
                 }
 
                 Pointer hwndPointer = hwndRef.get().getPointer();
@@ -180,10 +130,10 @@ public class DriverFactory {
 
 
                 winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), caps);
-                System.out.println("✅ ERP bağlantısı başarılı.");
+                System.out.println("ERP bağlantısı başarılı.");
 
             } catch (Exception e) {
-                throw new RuntimeException("❌ ERP bağlanılamadı: " + e.getMessage(), e);
+                throw new RuntimeException("ERP bağlanılamadı: " + e.getMessage(), e);
             }
         }
         return winDriver;
@@ -211,11 +161,11 @@ public class DriverFactory {
         }
         if (erpProcess != null && erpProcess.isAlive()) {
             erpProcess.destroy();
-            System.out.println("🛑 ERP uygulaması sonlandırıldı.");
+            System.out.println("ERP uygulaması sonlandırıldı.");
         }
         if (appiumProcess != null && appiumProcess.isAlive()) {
             appiumProcess.destroy();
-            System.out.println("🛑 Appium Server sonlandırıldı.");
+            System.out.println("Appium Server sonlandırıldı.");
         }
     }
 }

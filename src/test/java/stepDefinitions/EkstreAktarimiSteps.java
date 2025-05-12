@@ -17,7 +17,7 @@ public class EkstreAktarimiSteps {
 
     @Given("Kullanıcı sisteme başarılı şekilde giriş yapmış ve ana sayfa tamamen yüklenmiştir")
     public void kullaniciGirisYapti() {
-        System.out.println("✅ Giriş yapılmış ve ana sayfa hazır.");
+        System.out.println(" Giriş yapılmış ve ana sayfa hazır.");
     }
 
     @When("Sol menüdeki {string} seçeneğine tıklar")
@@ -58,13 +58,13 @@ public class EkstreAktarimiSteps {
 
     @Then("Fiş türünün {string} olarak güncellendiği doğrulanır")
     public void fisTuruGuncellendiMi(String expected) {
-        Assert.assertTrue(page.isFisTuruUpdated(expected), "❌ Fiş türü güncellenmedi: " + expected);
+        Assert.assertTrue(page.isFisTuruUpdated(expected), "Fiş türü güncellenmedi: " + expected);
     }
 
     @And("Kullanıcı {string} boş olan satırda, Durum alanı {string} olmalıdır")
     public void alanBoskenDurumKontrol(String alanTipi, String beklenenDurum) {
         boolean result = page.validateDurumForEmptyField(alanTipi, beklenenDurum);
-        Assert.assertTrue(result, "❌ Alan boşken beklenen durum sağlanmadı.");
+        Assert.assertTrue(result, "Alan boşken beklenen durum sağlanmadı.");
     }
 
     @When("Kullanıcı {string} alanındaki üç noktaya tıklar")
@@ -79,7 +79,7 @@ public class EkstreAktarimiSteps {
     @And("Kullanıcı {string} için açılan pencerede seç butonuna tıklar")
     public void secButonunaTikla(String alanTipi) {
         if (alanTipi == null || alanTipi.trim().isEmpty()) {
-            System.out.println("ℹ️ Alan tipi boş, seç butonu adımı atlanıyor.");
+            System.out.println("Alan tipi boş, seç butonu adımı atlanıyor.");
             return;
         }
         page.clickSelectButtonForField(alanTipi);
@@ -96,7 +96,7 @@ public class EkstreAktarimiSteps {
             result = page.checkDurumUpdatedAfterFieldFill(alanTipi, beklenenDurum);
         }
 
-        Assert.assertTrue(result, "❌ Alan doldurulduğunda beklenen durum sağlanmadı.");
+        Assert.assertTrue(result, "Alan doldurulduğunda beklenen durum sağlanmadı.");
     }
 
 
@@ -112,17 +112,17 @@ public class EkstreAktarimiSteps {
 
     @Then("Kaydın başarı ile eşleştiği yeşil bilgi kutucuğu görüntülenir")
     public void basariToastGorunur() {
-        Assert.assertTrue(page.isSuccessToastMessageVisible(), "❌ Toast mesajı görünmedi.");
+        Assert.assertTrue(page.isSuccessToastMessageVisible(), "Toast mesajı görünmedi.");
     }
 
     @Then("Durum alanı Eşlendi olarak güncellenmelidir")
     public void durumEslendiMi() {
-        Assert.assertTrue(page.isDurumEslendiGorunuyor(), "❌ Durum 'Eşlendi' değil.");
+        Assert.assertTrue(page.isDurumEslendiGorunuyor(), "Durum 'Eşlendi' değil.");
     }
 
     @Then("ERP Fiş No alanı dolu olmalıdır")
     public void erpFisNoDoluMu() {
-        Assert.assertTrue(page.isErpFisNoDoluMu(), "❌ ERP Fiş No alanı boş.");
+        Assert.assertTrue(page.isErpFisNoDoluMu(), "ERP Fiş No alanı boş.");
     }
 
 @When("Kullanıcı sağ tıklayıp {string} seçeneğini tıklar")
@@ -143,8 +143,8 @@ public void fisNoDogruMu() {
         popupFisNo = page.getFisNoFromPopup_Classic();
     }
 
-    System.out.println("🔍 ERP'den alınan Fiş No: " + kayitliErpFisNo);
-    System.out.println("🔍 Açılan popup'taki Fiş No: " + popupFisNo);
+    System.out.println(" ERP'den alınan Fiş No: " + kayitliErpFisNo);
+    System.out.println(" Açılan popup'taki Fiş No: " + popupFisNo);
     Assert.assertEquals(popupFisNo, kayitliErpFisNo, " Fiş No uyuşmuyor!");
 }
 
@@ -176,7 +176,7 @@ public void fisNoDogruMu() {
     @Then("Açılan kayıt Kasa İşlem No ile eşleşmeli ve form ekranı açılmalıdır")
     public void kasaFormuAcilmali() {
         Assert.assertTrue(page.verifyKasaFormOpenedWithCorrectFicheNo(),
-                "❌ Bankadan Çekilen formu açılmadı veya işlem no uyuşmuyor.");
+                " Bankadan Çekilen formu açılmadı veya işlem no uyuşmuyor.");
     }
 
 

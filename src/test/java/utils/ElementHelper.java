@@ -49,12 +49,12 @@ public class ElementHelper {
     public static void switchToWindowByTitle(String windowTitle) {
         HWND window = findWindowByExactTitle(windowTitle);
         if (window == null) {
-            throw new RuntimeException("❌ Pencere bulunamadı: " + windowTitle);
+            throw new RuntimeException(" Pencere bulunamadı: " + windowTitle);
         }
         if (!User32.INSTANCE.SetForegroundWindow(window)) {
-            throw new RuntimeException("❌ Pencere ön plana alınamadı: " + windowTitle);
+            throw new RuntimeException(" Pencere ön plana alınamadı: " + windowTitle);
         }
-        System.out.println("✅ Pencere aktif: " + windowTitle);
+        System.out.println("Pencere aktif: " + windowTitle);
     }
 
     public static void typeTextSmart(WebElement element, String text) {
@@ -66,7 +66,7 @@ public class ElementHelper {
                 Thread.sleep(100);
             }
         } catch (Exception e) {
-            System.out.println("❌ Yazı yazılamadı: " + e.getMessage());
+            System.out.println(" Yazı yazılamadı: " + e.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public class ElementHelper {
             element.click();
             Thread.sleep(300);
         } catch (Exception e) {
-            System.out.println("⚠️ Tıklama bekleme başarısız: " + e.getMessage());
+            System.out.println(" Tıklama bekleme başarısız: " + e.getMessage());
         }
     }
 
@@ -105,32 +105,12 @@ public class ElementHelper {
             if (upperCase) robot.keyRelease(KeyEvent.VK_SHIFT);
 
         } catch (IllegalArgumentException e) {
-            System.out.println("⚠️ Yazılamayan karakter: " + c);
+            System.out.println(" Yazılamayan karakter: " + c);
         }
     }
 
-    public static boolean isElementPresent(WindowsDriver driver, String accessibilityId, int timeoutInSeconds) {
-        try {
-            for (int i = 0; i < timeoutInSeconds * 2; i++) {
-                try {
-                    WebElement element = driver.findElement(MobileBy.AccessibilityId(accessibilityId));
-                    if (element.isDisplayed()) return true;
-                } catch (Exception ignored) { }
-                Thread.sleep(500);
-            }
-        } catch (InterruptedException ignored) { }
-        return false;
-    }
 
-    public static void maximizeWindowIfPresent(WindowsDriver driver, String accessibilityId) {
-        try {
-            WebElement button = driver.findElement(MobileBy.AccessibilityId(accessibilityId));
-            button.click();
-            System.out.println("🖥️ Ekran büyütme işlemi yapıldı.");
-        } catch (Exception e) {
-            System.out.println("⚠️ Ekran büyütülemedi: " + e.getMessage());
-        }
-    }
+
     public static void clearAndFillFieldIfExists(WindowsDriver driver, String accessibilityId, String value) {
         try {
             WebElement element = waitForElement(driver, "accessibilityId", accessibilityId, 10);
@@ -147,7 +127,7 @@ public class ElementHelper {
             element.sendKeys(Keys.CONTROL + "a", Keys.DELETE);
             element.sendKeys(value);
         } catch (Exception e) {
-            System.out.println("⚠️ Alan doldurulamadı: " + accessibilityId + " - " + e.getMessage());
+            System.out.println("️ Alan doldurulamadı: " + accessibilityId + " - " + e.getMessage());
         }
     }
 
@@ -173,7 +153,7 @@ public class ElementHelper {
             for (String handle : handles) {
                 DriverFactory.getWinDriver().switchTo().window(handle);
                 if (DriverFactory.getWinDriver().getTitle().equalsIgnoreCase(title)) {
-                    System.out.println("🪟 Pencere tespit edildi: " + title);
+                    System.out.println("Pencere tespit edildi: " + title);
                     return true;
                 }
             }
@@ -189,8 +169,6 @@ public class ElementHelper {
         System.out.println("⏳ Pencere bulunamadı: " + title);
         return false;
     }
-
-
 
 
 
@@ -235,73 +213,21 @@ public class ElementHelper {
             Thread.sleep(500); // kaydırma sonrası kısa bekleme
             menuItem.click();
 
-            System.out.println("✅ Ana Sayfa'ya geçiş başarılı.");
+            System.out.println(" Ana Sayfa'ya geçiş başarılı.");
             Thread.sleep(2000); // Sayfa geçiş sonrası stabilite
 
         } catch (Exception e) {
-            System.out.println("❌ Ana Sayfa'ya geçerken hata oluştu: " + e.getMessage());
+            System.out.println(" Ana Sayfa'ya geçerken hata oluştu: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
 
 
-//    public static void maximizeWindowWithRobot(String partialTitle) {
-//        System.out.println("⏳ Maximize işlemi başlatılıyor: " + partialTitle);
-//
-//        HWND[] foundWindow = new HWND[1];
-//
-//        boolean result = User32.INSTANCE.EnumWindows((hWnd, data) -> {
-//            char[] windowText = new char[512];
-//            User32.INSTANCE.GetWindowTextW(hWnd, windowText, 512);
-//            String wText = Native.toString(windowText).trim();
-//            System.out.println("🔍 Mevcut pencere: " + wText);
-//
-//            if (wText.contains(partialTitle)) {
-//                foundWindow[0] = hWnd;
-//                System.out.println("🎯 Hedef pencere bulundu: " + wText);
-//                return false; // pencere bulundu, dur
-//            }
-//            return true; // devam et
-//        }, null);
-//
-//        if (foundWindow[0] == null) {
-//            throw new RuntimeException("❌ Pencere bulunamadı: " + partialTitle);
-//        }
-//
-//        // Pencere restore ediliyor (minimize'den çıkarılıyor)
-//        // Pencereyi bulduktan sonra:
-//        User32Extra.INSTANCE.ShowWindow(foundWindow[0], 3); // SW_MAXIMIZE
-//        System.out.println("🪟 ShowWindow (maximize) çağrıldı.");
-//
-//        boolean foregroundResult = User32.INSTANCE.SetForegroundWindow(foundWindow[0]);
-//        if (!foregroundResult) {
-//            throw new RuntimeException("⚠️ SetForegroundWindow başarısız! Pencere ön plana alınamadı: " + partialTitle);
-//        }
-//
-//
-//        try {
-//            Robot robot = new Robot();
-//            robot.mouseMove(100, 100); // küçük bir odaklanma hilesi
-//            robot.delay(800);
-//            robot.keyPress(KeyEvent.VK_ALT);
-//            robot.keyPress(KeyEvent.VK_SPACE);
-//            robot.keyRelease(KeyEvent.VK_SPACE);
-//            robot.keyRelease(KeyEvent.VK_ALT);
-//
-//            Thread.sleep(500);
-//
-//            robot.keyPress(KeyEvent.VK_X);
-//            robot.keyRelease(KeyEvent.VK_X);
-//
-//            System.out.println("✅ Robot ile pencere maximize komutu gönderildi.");
-//        } catch (Exception e) {
-//            throw new RuntimeException("❌ Maximize işlemi başarısız!", e);
-//        }
-//    }
+
 
     public static void maximizeWindowWithRobot(String partialTitle) {
-        System.out.println("⏳ Maximize işlemi başlatılıyor: " + partialTitle);
+        System.out.println(" Maximize işlemi başlatılıyor: " + partialTitle);
 
         HWND[] foundWindow = new HWND[1];
 

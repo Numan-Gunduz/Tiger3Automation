@@ -24,7 +24,7 @@ public class Hooks {
     private static final String APP_NAME = "Online Hesap Özeti Uygulaması";
 
     private final TestContext context;
-    private static boolean uygulamaZatenBaslatildi = false; // 💡 Sadece ilk testte başlat
+    private static boolean uygulamaZatenBaslatildi = false; //  ssadece ilk testte başlat
 
     public Hooks(TestContext context) {
         this.context = context;
@@ -58,7 +58,7 @@ public class Hooks {
                 throw new RuntimeException(" ERP girişi sırasında hata oluştu: " + e.getMessage(), e);
             }
 
-            // Online Hesap Özeti Uygulamasını aç
+            // Online Hesap Özetti Uygulamasını aç
             ElementHelper.waitForElement(driver, "name", APP_NAME, 13).click();
             ElementHelper.waitForWindowByTitle(APP_NAME, 5);
             ElementHelper.switchToWindowByTitle(APP_NAME);
@@ -83,13 +83,15 @@ public class Hooks {
             LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(seleniumDriver);
             loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.123456");
 
-            try {
-                Thread.sleep(6000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println("Selenium WebDriver aktifleştirildi.");
-            uygulamaZatenBaslatildi = true; // bir daha çalıştırma
+            System.out.println("7 Saniye Dinamik Bekleme Ekleniyor...");
+            ElementHelper.sleep(7000);
+//            try {
+//                Thread.sleep(6000);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+            System.out.println("Slenium WebDriver aktifleştirildi.");
+            uygulamaZatenBaslatildi = true; // bir daha çalıştırmaa
         } else {
             System.out.println("Uygulama zaten açık. Yeni senaryoya geçiliyor.");
             //  buraya anasayfaya dön komutları eklenebilir

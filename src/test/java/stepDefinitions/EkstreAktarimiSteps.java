@@ -158,6 +158,10 @@ public void fisNoDogruMu() {
     public void negatifVeDurumluSatirSec(String durum) {
         page.selectRowWithNegativeTutarAndDurum(durum);
     }
+    @And("Tutarı pozitif ve Durumu {string} olan kaydın checkbox'ını işaretler")
+    public void pozitifVeDurumluSatirSec(String durum) {
+        page.selectRowWithPositiveTutarAndDurum(durum);
+    }
 
 
     @When("Kullanıcı ERP Kasa Kodu alanına göre Kasa İşlemleri'ne gider")
@@ -172,13 +176,25 @@ public void fisNoDogruMu() {
     public void bankadanCekilenFormuAcildiMi() {
         Assert.assertTrue(page.isBankadanCekilenFormAcildi(), " Açılan form 'Bankadan Çekilen' değil.");
     }
+    @Then("Açılan form Bankaya Yatırılan formu olmalıdır")
+    public void bankayaYatirilanFormuAcildiMi() {
+        Assert.assertTrue(page.isBankayaYatirilanFormAcildi(), "❌ Açılan form 'Bankaya Yatırılan' değil.");
+    }
 
     @Then("Açılan kayıt Kasa İşlem No ile eşleşmeli ve form ekranı açılmalıdır")
     public void kasaFormuAcilmali() {
         Assert.assertTrue(page.verifyKasaFormOpenedWithCorrectFicheNo(),
                 " Bankadan Çekilen formu açılmadı veya işlem no uyuşmuyor.");
     }
+    @And("kasa işlemleri için Açılan popup pencereleri kapatır")
+    public void kasaIslemleripopupPencereleriKapatir() {
+        page.closeOpenPopupsOneByOneforKasa();
+    }
 
 
-
+    @And("Online Hesap Özeti uygulamasına tıklar")
+    public void onlineHesapÖzetiUygulamasınaTıklar()
+    {
+        page.clickOnlineHesapOzetiApp();
+    }
 }

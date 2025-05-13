@@ -280,6 +280,74 @@ public class ElementHelper {
 
 
 
+        public static WebElement waitClickable(WebDriver driver, By locator, int timeoutSeconds) {
+            return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
+                    .until(ExpectedConditions.elementToBeClickable(locator));
+        }
+
+        public static WebElement waitPresence(WebDriver driver, By locator, int timeoutSeconds) {
+            return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
+                    .until(ExpectedConditions.presenceOfElementLocated(locator));
+        }
+
+        public static WebElement waitVisible(WebDriver driver, By locator, int timeoutSeconds) {
+            return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
+                    .until(ExpectedConditions.visibilityOfElementLocated(locator));
+        }
+
+        public static boolean waitInvisible(WebDriver driver, By locator, int timeoutSeconds) {
+            return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
+                    .until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        }
+
+        public static void clickWithJS(WebDriver driver, WebElement element) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
+
+        public static void sleep(int milliseconds) {
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        public static boolean isElementDisplayed(WebElement element) {
+            try {
+                return element.isDisplayed();
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        }
+
+        public static WebElement findElementSafe(WebDriver driver, By locator) {
+            try {
+                return driver.findElement(locator);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    public static void scrollBy(WebDriver driver, int x, int y) {
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(arguments[0], arguments[1]);", x, y);
     }
+
+    public static void safeContextClick(WebDriver driver, WebElement element) {
+        try {
+            new Actions(driver).contextClick(element).perform();
+        } catch (Exception e) {
+            throw new RuntimeException("Context click başarısız: " + e.getMessage());
+        }
+    }
+
+    public static void waitAndClickTextSpanByExactText(WebDriver driver, String text, int timeoutSeconds) {
+        By locator = By.xpath("//span[normalize-space(text())='" + text + "']");
+        WebElement element = waitClickable(driver, locator, timeoutSeconds);
+        element.click();
+    }
+
+}
+
+
+
 
 

@@ -57,7 +57,7 @@
     </properties>
 
     <dependencies>
-        <!-- Bu interface'leri barındıran ana modül -->
+
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-api</artifactId>

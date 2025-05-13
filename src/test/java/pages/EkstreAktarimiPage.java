@@ -17,6 +17,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import utils.ElementHelper;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -31,6 +32,7 @@ public class EkstreAktarimiPage {
     private final WindowsDriver winDriver;
     private final WebDriverWait wait;
     private WebElement selectedRowElement;
+
 
     public EkstreAktarimiPage(TestContext context) {
         this.webDriver = context.getWebDriver();
@@ -71,11 +73,12 @@ public class EkstreAktarimiPage {
                     break;
                 }
             } catch (Exception ignored) {}
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            ElementHelper.sleep(500);
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
         }
 
         if (!success) {
@@ -587,7 +590,42 @@ public class EkstreAktarimiPage {
             throw new RuntimeException(e);
         }
     }
+    public void closeOpenPopupsOneByOneforKasa() {
+        try {
+            System.out.println(" Açık popup pencereleri kapatılıyor...");
 
+            // İlk pencereyi kapat
+            WebElement closeBtn1 = winDriver.findElement(MobileBy.AccessibilityId("CloseBtn"));
+            closeBtn1.click();
+            System.out.println("İlk popup kapatıldı.");
+
+            Thread.sleep(1500); // bekle, ikinci pencerenin ön plana geçmesini sağla
+
+            // İkinci pencereyi kapat
+            WebElement closeBtn2 = winDriver.findElement(MobileBy.AccessibilityId("CloseBtn"));
+            closeBtn2.click();
+            System.out.println(" İkinci popup kapatıldı.");
+
+
+            // üçüncüsü pencereyi kapat
+            WebElement closeBtn3 = winDriver.findElement(MobileBy.AccessibilityId("CloseBtn"));
+            closeBtn3.click();
+            System.out.println(" üçüncü popup kapatıldı.");
+
+        } catch (Exception e) {
+            System.out.println(" Popup kapatılırken hata oluştu: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    private static final String APP_NAME = "Online Hesap Özeti Uygulaması";
+    public void clickOnlineHesapOzetiApp()
+    {
+        System.out.println("Online Hesap Özeti'ne tıklanıyor");
+        ElementHelper.sleep(2000);
+        WebElement  OnlineHesapOzetiButton = winDriver.findElement((MobileBy.name("Online Hesap Özeti Uygulaması")));
+        OnlineHesapOzetiButton.click();
+        System.out.println("Online Hesap Özeti Uygulamasına Tıklandı");
+    }
     public boolean checkDurumOnly(String expectedDurum) {
         try {
             List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
@@ -656,6 +694,42 @@ public class EkstreAktarimiPage {
         }
 
         throw new RuntimeException(" Negatif tutarlı ve '" + beklenenDurum + "' durumuna sahip satır bulunamadı.");
+    }
+    public void selectRowWithPositiveTutarAndDurum(String beklenenDurum) {
+        List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+        List<WebElement> rows = webDriver.findElements(By.xpath("//tbody/tr"));
+
+        int tutarIndex = -1;
+        int durumIndex = -1;
+
+        for (int i = 0; i < headers.size(); i++) {
+            String text = headers.get(i).getText().trim();
+            if (text.equalsIgnoreCase("Tutar")) tutarIndex = i + 1;
+            if (text.equalsIgnoreCase("Durum")) durumIndex = i + 1;
+        }
+
+        if (tutarIndex == -1 || durumIndex == -1)
+            throw new RuntimeException(" 'Tutar' veya 'Durum' sütunu bulunamadı");
+
+        for (WebElement row : rows) {
+            WebElement tutarCell = row.findElement(By.xpath("./td[" + tutarIndex + "]"));
+            WebElement durumCell = row.findElement(By.xpath("./td[" + durumIndex + "]"));
+
+            String tutarText = tutarCell.getText().trim().replace(",", "."); // Noktalı formatları normalize et
+            String durumText = durumCell.getText().trim();
+
+            if (!tutarText.startsWith("-") && durumText.equalsIgnoreCase(beklenenDurum)) {
+                WebElement checkbox = row.findElement(By.xpath(".//input[@type='checkbox']"));
+                if (!checkbox.isSelected()) {
+                    WebElement span = row.findElement(By.cssSelector(".ant-checkbox-inner"));
+                    ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", span);
+                }
+                selectedRowElement = row;
+                return;
+            }
+        }
+
+        throw new RuntimeException(" Pozitif tutarlı ve '" + beklenenDurum + "' durumuna sahip satır bulunamadı.");
     }
 
 
@@ -760,6 +834,15 @@ public class EkstreAktarimiPage {
         }
     }
 
+    public boolean isBankayaYatirilanFormAcildi() {
+        try {
+            WebElement titleBar = winDriver.findElement(By.xpath("//*[contains(@Name, 'Bankaya Yatýrýlan')]"));
+            return titleBar != null && titleBar.isDisplayed();
+        } catch (Exception e) {
+            System.out.println(" Bankaya Yatırılan formu bulunamadı: " + e.getMessage());
+            return false;
+        }
+    }
 
     public boolean verifyKasaFormOpenedWithCorrectFicheNo() {
         try {

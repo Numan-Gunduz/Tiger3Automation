@@ -858,6 +858,29 @@ public class EkstreAktarimiPage {
             return false;
         }
     }
+    public boolean isBankaislemFisiFormAcildi() {
+        ElementHelper.sleep(2000);
+        System.out.println("2 saniye dinamik olarak bekleniyor");
+        try {
+            WebElement titleBar = winDriver.findElement(By.xpath("//*[contains(@Name, 'Banka İşlem Fişi')]"));
+            return titleBar != null && titleBar.isDisplayed();
+        } catch (Exception e) {
+            System.out.println("Banka işlem fişi form ekranı bulunamadı: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean isFisTuruDegismedi(String istenmeyenDeger) {
+        try {
+            String mevcutDeger = getCurrentFisTuru();
+            System.out.println("🔍 Mevcut fiş türü: " + mevcutDeger + " | Değişmemesi gereken tür: " + istenmeyenDeger);
+            return !mevcutDeger.equalsIgnoreCase(istenmeyenDeger);  // fiş türü değişmemişse true döner
+        } catch (Exception e) {
+            System.out.println("Fiş türü kontrol hatası: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 
 }

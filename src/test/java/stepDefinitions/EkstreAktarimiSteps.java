@@ -178,7 +178,7 @@ public void fisNoDogruMu() {
     }
     @Then("Açılan form Bankaya Yatırılan formu olmalıdır")
     public void bankayaYatirilanFormuAcildiMi() {
-        Assert.assertTrue(page.isBankayaYatirilanFormAcildi(), "❌ Açılan form 'Bankaya Yatırılan' değil.");
+        Assert.assertTrue(page.isBankayaYatirilanFormAcildi(), "Açılan form 'Bankaya Yatırılan' değil.");
     }
 
     @Then("Açılan kayıt Kasa İşlem No ile eşleşmeli ve form ekranı açılmalıdır")
@@ -197,4 +197,19 @@ public void fisNoDogruMu() {
     {
         page.clickOnlineHesapOzetiApp();
     }
+
+    @Then("Açılan form ekranındaki fiş Banka işlem fişi olmalıdır")
+    public void bankaIslemFısıAcildiMi() {
+        Assert.assertTrue(page.isBankaislemFisiFormAcildi(), "Açılan form 'Banka İşlem Fişi' değil.");
+    }
+
+    @Then("İlgili kaydın fiş türü {string} olarak değişmeden kaldığı doğrulanır")
+    public void fisTuruDegismediMi(String beklenenDeger) {
+        Assert.assertTrue(
+                page.isFisTuruDegismedi(beklenenDeger),
+                "❌ Fiş türü yanlışlıkla değişmiş: '" + beklenenDeger + "' oldu!"
+        );
+    }
+
+
 }

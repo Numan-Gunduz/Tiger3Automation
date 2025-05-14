@@ -30,10 +30,51 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
   | Menü            | Banka          | IBAN                    | TarihGeriGun   | ListeleButonu | Durum1                | Durum2         | MenuText           | FisTuru                   | AlanTipi                   | DurumKontrol           | DurumSon       | PopupSecenek   |
 
 
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 21             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Banka İşlem Fişi          |                            | Kaydedilebilir         | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 21             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Hizmet Faturası Fişi      | ERP Hizmet Kodu            | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 21             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Virman Fişi               | ERP Banka Hesap Kodu       | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 21             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Havale/EFT Fişi           | ERP Cari Hesap Kodu        | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 22             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Banka İşlem Fişi          |                            | Kaydedilebilir         | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 22             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Hizmet Faturası Fişi      | ERP Hizmet Kodu            | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 22             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Virman Fişi               | ERP Banka Hesap Kodu       | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 22             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Havale/EFT Fişi           | ERP Cari Hesap Kodu        | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+
+
+  @krediKartiNegatifKayit
+  Scenario: Tutarı negatif olan Kredi Kartı Ödeme Fişi kaydının seçilmesi ve fiş oluşturulması
+
+    Given Kullanıcı sisteme başarılı şekilde giriş yapmış ve ana sayfa tamamen yüklenmiştir
+    When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
+    And Banka dropdown'undan "Finansbank" seçer
+    And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
+    And Kullanıcı başlangıç tarihi olarak bugünden 22 gün önceki tarihi girer
+    And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
+    And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
+    And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kredi Kartı Ödeme Fişi" seçeneğini seçer
+    Then Fiş türünün "Kredi Kartı Ödeme Fişi" olarak güncellendiği doğrulanır
+    And Kullanıcı "" boş olan satırda, Durum alanı "Kaydedilebilir" olmalıdır
+    And Fiş oluştur butonuna tıklar
+    And Açılan onay popup'ında Evet'e tıklar
+    Then Kaydın başarı ile eşleştiği yeşil bilgi kutucuğu görüntülenir
+    Then Durum alanı Eşlendi olarak güncellenmelidir
+    Then ERP Fiş No alanı dolu olmalıdır
+    When Kullanıcı sağ tıklayıp "Fiş İncele" seçeneğini tıklar
+    Then Açılan form ekranındaki fiş Banka işlem fişi olmalıdır
+    Then Açılan ekrandaki Fiş No alanı ile ERP Fiş No değeri aynı olmalıdır
+    And Açılan popup pencereleri kapatır
+
+
+  @krediKartiGüncellenmeyenFisTürü
+  Scenario: Tutarı pozitif olan Kredi Kartı Ödeme Fişi kaydının türünün değişmediği görülür
+
+    Given Kullanıcı sisteme başarılı şekilde giriş yapmış ve ana sayfa tamamen yüklenmiştir
+    When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
+    And Banka dropdown'undan "Finansbank" seçer
+    And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
+    And Kullanıcı başlangıç tarihi olarak bugünden 22 gün önceki tarihi girer
+    And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
+    And Tutarı pozitif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
+    And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kredi Kartı Ödeme Fişi" seçeneğini seçer
+    Then İlgili kaydın fiş türü "Kredi Kartı Ödeme Fişi" olarak değişmeden kaldığı doğrulanır
+
+
+
 
   @negatifTutarTesti
   Scenario: Tutarı negatif olan Kasa İşlem Fişi kaydının seçilmesi ve fiş oluşturulması
@@ -42,7 +83,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 21 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 22 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer
@@ -70,7 +111,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 21 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 22 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı pozitif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer

@@ -1,7 +1,10 @@
 package utils;
 
 import base.TestContext;
-
+import io.cucumber.java.AfterStep;
+import io.qameta.allure.Attachment;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.windows.WindowsDriver;
 import io.cucumber.java.After;
@@ -106,11 +109,30 @@ public class Hooks {
     @After
     public void tearDown(Scenario scenario) {
         if (scenario.isFailed()) {
+
             System.out.println(" Test başarısız oldu: " + scenario.getName());
         } else {
             System.out.println(" Test başarıyla tamamlandı.");
         }
 
+
+        //teslerden sonra oluşan raporu görüntülemek için kullanılan komuy:
+        //http://192.168.1.37:54099/index.html
+        //mvn allure:report
     }
+
+//    @AfterStep
+//    public void afterEachStep(Scenario scenario) {
+//        if (scenario.isFailed()) {
+//            TakesScreenshot ts = (TakesScreenshot) context.getWebDriver();
+//            byte[] screenshot = ts.getScreenshotAs(OutputType.BYTES);
+//            attachScreenshot(screenshot);
+//        }
+//    }
+//
+//    @Attachment(value = "Failed Step Screenshot", type = "image/png")
+//    public byte[] attachScreenshot(byte[] screenshot) {
+//        return screenshot;
+//    }
 
 }

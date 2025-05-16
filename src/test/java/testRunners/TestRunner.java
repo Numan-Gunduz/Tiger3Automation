@@ -7,9 +7,8 @@ import io.cucumber.testng.CucumberOptions;
         features = "src/test/java/features",
         glue = {"stepDefinitions", "utils"},
         plugin = {
-                "pretty",
-                "html:target/cucumber-reports.html",
-                "json:target/cucumber.json"
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"  // ← Allure eklendi!
+
         },
         dryRun = false
 )

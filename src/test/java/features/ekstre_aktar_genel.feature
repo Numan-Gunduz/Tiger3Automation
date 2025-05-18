@@ -30,10 +30,10 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
   | Menü            | Banka          | IBAN                    | TarihGeriGun   | ListeleButonu | Durum1                | Durum2         | MenuText           | FisTuru                   | AlanTipi                   | DurumKontrol           | DurumSon       | PopupSecenek   |
 
 
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 23             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Banka İşlem Fişi          |                            | Kaydedilebilir         | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 24             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Hizmet Faturası Fişi      | ERP Hizmet Kodu            | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 24             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Virman Fişi               | ERP Banka Hesap Kodu       | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
-  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 23             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Havale/EFT Fişi           | ERP Cari Hesap Kodu        | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 26             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Banka İşlem Fişi          |                            | Kaydedilebilir         | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 26             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Hizmet Faturası Fişi      | ERP Hizmet Kodu            | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 26             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Virman Fişi               | ERP Banka Hesap Kodu       | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
+  | Ekstre Aktarımı | Ziraat Bankası | TR0300**5013 - ZİRAAT   | 26             | Listele       | Eksik Bilgi Bulunuyor | Kaydedilebilir | Fiş Türü Değiştir  | Havale/EFT Fişi           | ERP Cari Hesap Kodu        | Eksik Bilgi Bulunuyor  | Kaydedilebilir | Fiş İncele     |
 
 
   @krediKartiNegatifKayit
@@ -43,7 +43,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 24 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 26 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kredi Kartı Ödeme Fişi" seçeneğini seçer
@@ -67,7 +67,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 24 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 26 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı pozitif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kredi Kartı Ödeme Fişi" seçeneğini seçer
@@ -83,7 +83,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 24 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 26 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer
@@ -111,7 +111,7 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 24 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihi olarak bugünden 26 gün önceki tarihi girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı pozitif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer

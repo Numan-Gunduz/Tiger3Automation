@@ -117,7 +117,9 @@ public class Hooks {
 
 
         //teslerden sonra oluşan raporu görüntülemek için kullanılan komuy:
+
         //http://192.168.1.37:54099/index.html
+        //http://localhost:63342/Tiger3Automation/target/site/allure-maven-plugin/#graph
         //mvn allure:report
     }
 

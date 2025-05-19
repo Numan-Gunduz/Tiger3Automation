@@ -176,6 +176,7 @@ public class EkstreAktarimiPage {
     }
 
     public boolean isFisTuruUpdated(String expectedText) {
+        ElementHelper.sleep(2000);
         try {
             WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
 

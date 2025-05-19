@@ -128,6 +128,23 @@ public class Hooks {
 //        if (scenario.isFailed()) {
 //            TakesScreenshot ts = (TakesScreenshot) context.getWebDriver();
 //            byte[] screenshot = ts.getScreenshotAs(OutputType.BYTES);
+//            // Burada dikkat: return ederek Allure'a iletiyorsun
+//            saveScreenshotToAllure(screenshot);
+//        }
+//    }
+//
+//    @Attachment(value = "Failed Step Screenshot", type = "image/png")
+//    public byte[] saveScreenshotToAllure(byte[] screenshot) {
+//        return screenshot;
+//    }
+
+
+
+//    @AfterStep
+//    public void afterEachStep(Scenario scenario) {
+//        if (scenario.isFailed()) {
+//            TakesScreenshot ts = (TakesScreenshot) context.getWebDriver();
+//            byte[] screenshot = ts.getScreenshotAs(OutputType.BYTES);
 //            attachScreenshot(screenshot);
 //        }
 //    }

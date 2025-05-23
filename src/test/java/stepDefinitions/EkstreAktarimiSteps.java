@@ -207,7 +207,7 @@ public void fisNoDogruMu() {
     public void fisTuruDegismediMi(String beklenenDeger) {
         Assert.assertTrue(
                 page.isFisTuruDegismedi(beklenenDeger),
-                "❌ Fiş türü yanlışlıkla değişmiş: '" + beklenenDeger + "' oldu!"
+                " Fiş türü yanlışlıkla değişmiş: '" + beklenenDeger + "' oldu!"
         );
     }
 

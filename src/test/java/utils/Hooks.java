@@ -88,11 +88,7 @@ public class Hooks {
 
             System.out.println("7 Saniye Dinamik Bekleme Ekleniyor...");
             ElementHelper.sleep(7000);
-//            try {
-//                Thread.sleep(6000);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
+
             System.out.println("Slenium WebDriver aktifleştirildi.");
             uygulamaZatenBaslatildi = true; // bir daha çalıştırmaa
         } else {

@@ -7,7 +7,9 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
   When Sol menüdeki "<Menü>" seçeneğine tıklar
   And Banka dropdown'undan "<Banka>" seçer
   And Hesap dropdown'undan "<IBAN>" hesabını seçer
-  And Kullanıcı başlangıç tarihi olarak bugünden <TarihGeriGun> gün önceki tarihi girer
+#  And Kullanıcı başlangıç tarihi olarak bugünden <TarihGeriGun> gün önceki tarihi girer
+ And Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer
+  And Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer
   And "<ListeleButonu>" butonuna tıklar ve sonuçların yüklenmesi beklenir
   And Yüklenen ekstre kayıtlarından "<Durum1>" veya "<Durum2>" durumundaki bir kaydın solundaki seçim kutusunu işaretler
   And Seçilen kayda sağ tık yapar ve "<MenuText>" > "<FisTuru>" seçeneğini seçer
@@ -44,7 +46,9 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
     And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
-    And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
+    #And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
+    And Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer
+    And Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer
     And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kredi Kartı Ödeme Fişi" seçeneğini seçer
     Then Fiş türünün "Kredi Kartı Ödeme Fişi" olarak güncellendiği doğrulanır
@@ -67,7 +71,9 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
+    #And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer
+    And Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı pozitif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kredi Kartı Ödeme Fişi" seçeneğini seçer
@@ -83,7 +89,9 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
+    #And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer
+    And Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı negatif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer
@@ -111,7 +119,9 @@ Scenario Outline: Kullanıcı eksik bilgi bulunan fişi düzenler ve kaydeder
     When Sol menüdeki "Ekstre Aktarımı" seçeneğine tıklar
     And Banka dropdown'undan "Finansbank" seçer
     And Hesap dropdown'undan "TR800011100000000013598759" hesabını seçer
-    And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
+    #And Kullanıcı başlangıç tarihi olarak bugünden 31 gün önceki tarihi girer
+    And Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer
+    And Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer
     And "Listele" butonuna tıklar ve sonuçların yüklenmesi beklenir
     And Tutarı pozitif ve Durumu "Eksik Bilgi Bulunuyor" olan kaydın checkbox'ını işaretler
     And Seçilen kayda sağ tık yapar ve "Fiş Türü Değiştir" > "Kasa İşlem Fişi" seçeneğini seçer

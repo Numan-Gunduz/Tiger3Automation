@@ -210,6 +210,15 @@ public void fisNoDogruMu() {
                 " Fiş türü yanlışlıkla değişmiş: '" + beklenenDeger + "' oldu!"
         );
     }
+    @And("Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer")
+    public void kullaniciBaslangicTarihiGirer() {
+        page.enterStartDateFixed();
+    }
+
+    @And("Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer")
+    public void kullaniciBitisTarihiGirer() {
+        page.enterEndDateFixed();
+    }
 
 
 }

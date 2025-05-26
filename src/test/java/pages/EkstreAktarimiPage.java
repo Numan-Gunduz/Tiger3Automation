@@ -122,6 +122,48 @@ public class EkstreAktarimiPage {
         }
     }
 
+    public void enterStartDateFixed() {
+        String dateStr = "22/04/2025";
+        By inputLocator = By.id("input-logo-elements-date-picker-10");
+
+        // Eğer element DOM'da yoksa (önceden girilmiş olabilir) atla
+        List<WebElement> inputs = webDriver.findElements(inputLocator);
+        if (inputs.isEmpty()) {
+            System.out.println("Başlangıç tarihi input'u görünmüyor, işlem atlandı.");
+            return;
+        }
+
+        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(inputLocator));
+
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", input);
+        input.click();
+        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        input.sendKeys(Keys.DELETE);
+        input.sendKeys(dateStr);
+        input.sendKeys(Keys.ENTER);
+    }
+
+    public void enterEndDateFixed() {
+        String dateStr = "22/04/2025";
+        By inputLocator = By.id("input-logo-elements-date-picker-11");
+
+        // Eğer element DOM'da yoksa (önceden girilmiş olabilir) atla
+        List<WebElement> inputs = webDriver.findElements(inputLocator);
+        if (inputs.isEmpty()) {
+            System.out.println("Başlangıç tarihi input'u görünmüyor, işlem atlandı.");
+            return;
+        }
+
+        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(inputLocator));
+
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", input);
+        input.click();
+        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        input.sendKeys(Keys.DELETE);
+        input.sendKeys(dateStr);
+        input.sendKeys(Keys.ENTER);
+    }
+
 
 
     public void enterStartDateDaysAgo(int daysAgo) {

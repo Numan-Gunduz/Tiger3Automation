@@ -36,10 +36,10 @@ public class EkstreAktarimiSteps {
         page.selectAccount(iban, currentBank);
     }
 
-    @And("Kullanıcı başlangıç tarihi olarak bugünden {int} gün önceki tarihi girer")
-    public void kullaniciBaslangicTarihiGirer(int daysAgo) {
-        page.enterStartDateDaysAgo(daysAgo);
-    }
+//    @And("Kullanıcı başlangıç tarihi olarak bugünden {int} gün önceki tarihi girer")
+//    public void kullaniciBaslangicTarihiGirer(int daysAgo) {
+//        page.enterStartDateDaysAgo(daysAgo);
+//    }
 
     @And("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
     public void listeleButonunaTikla(String buton) {

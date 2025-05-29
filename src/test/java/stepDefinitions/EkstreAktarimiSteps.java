@@ -5,6 +5,7 @@ import base.TestContext;
 import io.cucumber.java.en.*;
 import org.testng.Assert;
 import pages.EkstreAktarimiPage;
+import utils.ElementHelper;
 
 public class EkstreAktarimiSteps {
     private final EkstreAktarimiPage page;
@@ -23,6 +24,7 @@ public class EkstreAktarimiSteps {
     @When("Sol menüdeki {string} seçeneğine tıklar")
     public void solMenuSec(String menu) {
         page.clickSidebarMenu(menu);
+
     }
 
     @And("Banka dropdown'undan {string} seçer")
@@ -36,13 +38,14 @@ public class EkstreAktarimiSteps {
         page.selectAccount(iban, currentBank);
     }
 
-//    @And("Kullanıcı başlangıç tarihi olarak bugünden {int} gün önceki tarihi girer")
-//    public void kullaniciBaslangicTarihiGirer(int daysAgo) {
-//        page.enterStartDateDaysAgo(daysAgo);
-//    }
+    @And("Kullanıcı başlangıç tarihi olarak bugünden {int} gün önceki tarihi girer")
+    public void kullaniciBaslangicTarihiGirer(int daysAgo) {
+        page.enterStartDateDaysAgo(daysAgo);
+    }
 
     @And("{string} butonuna tıklar ve sonuçların yüklenmesi beklenir")
     public void listeleButonunaTikla(String buton) {
+
         page.clickListele();
     }
 
@@ -209,15 +212,6 @@ public void fisNoDogruMu() {
                 page.isFisTuruDegismedi(beklenenDeger),
                 " Fiş türü yanlışlıkla değişmiş: '" + beklenenDeger + "' oldu!"
         );
-    }
-    @And("Kullanıcı başlangıç tarihini 22 Nisan 2025 olarak girer")
-    public void kullaniciBaslangicTarihiGirer() {
-        page.enterStartDateFixed();
-    }
-
-    @And("Kullanıcı bitiş tarihini 22 Nisan 2025 olarak girer")
-    public void kullaniciBitisTarihiGirer() {
-        page.enterEndDateFixed();
     }
 
 

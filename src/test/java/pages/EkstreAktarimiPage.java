@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ElementHelper;
 
+import javax.swing.text.Element;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.Duration;
@@ -39,6 +40,7 @@ public class EkstreAktarimiPage {
         this.winDriver = context.getWindowsDriver();
         this.wait = new WebDriverWait(webDriver, Duration.ofSeconds(40));
     }
+
 
     public void clickSidebarMenu(String menu) {
         WebElement menuElement = wait.until(ExpectedConditions.elementToBeClickable(
@@ -74,11 +76,7 @@ public class EkstreAktarimiPage {
                 }
             } catch (Exception ignored) {}
             ElementHelper.sleep(500);
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
+
         }
 
         if (!success) {
@@ -107,7 +105,7 @@ public class EkstreAktarimiPage {
                     By.xpath("//div[@class='ant-select-item-option-content' and normalize-space(text())='" + iban + "']")));
 
             ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", option);
-            System.out.println("✅ '" + iban + "' hesabı başarıyla seçildi.");
+            System.out.println(" '" + iban + "' hesabı başarıyla seçildi.");
 
             WebElement selectedBank = webDriver.findElement(By.xpath("(//span[@class='ant-select-selection-item'])[1]"));
             String currentBank = selectedBank.getText().trim();
@@ -121,49 +119,6 @@ public class EkstreAktarimiPage {
             throw new RuntimeException("Hesap seçimi başarısız: " + e.getMessage());
         }
     }
-
-    public void enterStartDateFixed() {
-        String dateStr = "22/04/2025";
-        By inputLocator = By.id("input-logo-elements-date-picker-10");
-
-        // Eğer element DOM'da yoksa (önceden girilmiş olabilir) atla
-        List<WebElement> inputs = webDriver.findElements(inputLocator);
-        if (inputs.isEmpty()) {
-            System.out.println("Başlangıç tarihi input'u görünmüyor, işlem atlandı.");
-            return;
-        }
-
-        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(inputLocator));
-
-        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", input);
-        input.click();
-        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        input.sendKeys(Keys.DELETE);
-        input.sendKeys(dateStr);
-        input.sendKeys(Keys.ENTER);
-    }
-
-    public void enterEndDateFixed() {
-        String dateStr = "22/04/2025";
-        By inputLocator = By.id("input-logo-elements-date-picker-11");
-
-        // Eğer element DOM'da yoksa (önceden girilmiş olabilir) atla
-        List<WebElement> inputs = webDriver.findElements(inputLocator);
-        if (inputs.isEmpty()) {
-            System.out.println("Başlangıç tarihi input'u görünmüyor, işlem atlandı.");
-            return;
-        }
-
-        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(inputLocator));
-
-        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", input);
-        input.click();
-        input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        input.sendKeys(Keys.DELETE);
-        input.sendKeys(dateStr);
-        input.sendKeys(Keys.ENTER);
-    }
-
 
 
     public void enterStartDateDaysAgo(int daysAgo) {
@@ -185,7 +140,7 @@ public class EkstreAktarimiPage {
                 .executeScript("return arguments[0].shadowRoot", host);
         WebElement span = shadowRoot.findElement(By.cssSelector("span[part='label']"));
         ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", span);
-
+ElementHelper.sleep(2000);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(
                 By.xpath("//*[contains(text(),'Verilerinizi bankalardan listeliyoruz')]")));
     }
@@ -211,9 +166,11 @@ public class EkstreAktarimiPage {
     }
 
     public void changeFisTypeTo(String menu, String fisTuru) {
+        ElementHelper.sleep(1000);
         new Actions(webDriver).contextClick(selectedRowElement).perform();
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='" + menu + "']"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='" + fisTuru + "']"))).click();
+        ElementHelper.sleep(2000);
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Tamam']"))).click();
     }
 
@@ -287,20 +244,34 @@ public class EkstreAktarimiPage {
         clickThreeDotsInField("ERP Kasa Kodu");
     }
 
-    private void clickThreeDotsInField(String header) {
-        List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
-        int targetIndex = -1;
-        for (int i = 0; i < headers.size(); i++) {
-            if (headers.get(i).getText().trim().equalsIgnoreCase(header)) {
-                targetIndex = i;
-                break;
-            }
+private void clickThreeDotsInField(String header) {
+    List<WebElement> headers = webDriver.findElements(By.xpath("//thead//th"));
+    int targetIndex = -1;
+    for (int i = 0; i < headers.size(); i++) {
+        if (headers.get(i).getText().trim().equalsIgnoreCase(header)) {
+            targetIndex = i;
+            break;
         }
-        if (targetIndex == -1) throw new RuntimeException("Sütun bulunamadı");
-        WebElement cell = selectedRowElement.findElements(By.tagName("td")).get(targetIndex);
-        WebElement host = cell.findElement(By.cssSelector("logo-elements-icon[icon='leds:three_dots_hor']"));
-        ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", host);
     }
+    if (targetIndex == -1) throw new RuntimeException("Sütun bulunamadı: " + header);
+
+    WebElement cell = selectedRowElement.findElements(By.tagName("td")).get(targetIndex);
+
+    new Actions(webDriver).moveToElement(cell).perform();
+    ElementHelper.sleep(300); // ikonlar hover sonrası görünürse bekle
+
+    try {
+        WebElement iconHost = cell.findElement(By.cssSelector("logo-elements-icon"));
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", iconHost);
+        ((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", iconHost);  // ✅ host'a tıkla
+    } catch (Exception e) {
+        throw new RuntimeException(" Üç nokta ikonuna tıklanamadı (host üzerinden): " + e.getMessage(), e);
+    }
+}
+
+
+
+
 
     public void clickThreeDotsForField(String alan) {
         if (alan.equalsIgnoreCase("ERP Cari Hesap Kodu")) {
@@ -589,6 +560,7 @@ public class EkstreAktarimiPage {
 
     public String getFisNoFromPopup_HizmetFaturasi() {
         try {
+            ElementHelper.sleep(2000);
             WebDriverWait wait = new WebDriverWait(winDriver, Duration.ofSeconds(10));
             WebElement fisNo = wait.until(ExpectedConditions.presenceOfElementLocated(
                     MobileBy.AccessibilityId("ficheNoEdit")));
@@ -601,6 +573,8 @@ public class EkstreAktarimiPage {
 
     public String getFisNoFromPopup_Classic() {
         try {
+            ElementHelper.sleep(2000);
+
             WebDriverWait wait = new WebDriverWait(winDriver, Duration.ofSeconds(10));
             WebElement fisNo = wait.until(ExpectedConditions.presenceOfElementLocated(
                     MobileBy.AccessibilityId("FicheNoEdit")));

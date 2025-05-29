@@ -166,7 +166,7 @@ public class ElementHelper {
             }
         }
 
-        System.out.println("⏳ Pencere bulunamadı: " + title);
+        System.out.println(" Pencere bulunamadı: " + title);
         return false;
     }
 
@@ -184,10 +184,10 @@ public class ElementHelper {
                                 .equals("complete")
                 );
             } else {
-                System.out.println("⏭️ Driver tipi desteklenmiyor → " + driver.getClass().getSimpleName() + " (waitForPageLoad atlandı)");
+                System.out.println("Driver tipi desteklenmiyor → " + driver.getClass().getSimpleName() + " (waitForPageLoad atlandı)");
             }
         } catch (Exception e) {
-            System.out.println("⚠️ waitForPageLoad exception: " + e.getMessage());
+            System.out.println(" waitForPageLoad exception: " + e.getMessage());
         }
     }
 
@@ -200,7 +200,7 @@ public class ElementHelper {
 
     public static void navigateToHomePage(WebDriver seleniumDriver) {
         try {
-            System.out.println("🏠 Ana Sayfa'ya dönülüyor...");
+            System.out.println("Ana Sayfa'ya dönülüyor...");
 
             WebDriverWait wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(15));
 

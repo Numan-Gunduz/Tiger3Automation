@@ -86,8 +86,8 @@ public class Hooks {
             LoginPageOnlineOzet loginPage = new LoginPageOnlineOzet(seleniumDriver);
             loginPage.loginIfRequired("kemal.yapici@elogo.com.tr", "Kemal.123456");
 
-            System.out.println("7 Saniye Dinamik Bekleme Ekleniyor...");
-            ElementHelper.sleep(7000);
+            System.out.println("3 Saniye Dinamik Bekleme Ekleniyor...");
+            ElementHelper.sleep(3000);
 
             System.out.println("Slenium WebDriver aktifleştirildi.");
             uygulamaZatenBaslatildi = true; // bir daha çalıştırmaa
